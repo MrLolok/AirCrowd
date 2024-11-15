@@ -11,5 +11,8 @@
         <module name="PassengerPrediction" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="API" target="23" />
+    </bytecodeTargetLevel>
   </component>
 </project>
