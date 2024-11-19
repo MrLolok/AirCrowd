@@ -16,5 +16,7 @@ public interface APIClient {
 
     void setBaseQueryParams(@NotNull List<QueryParam> queryParams);
 
+    void start();
+
     void close() throws IOException;
 }

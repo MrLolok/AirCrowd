@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class SimpleHttpAPIClientRequester extends HttpAPIClient implements APIClientRequester {
+public class HttpAPIClientRequester extends HttpAPIClient implements APIClientRequester {
     @Override
     public void request(@Nullable ResponseCallback callback, @NotNull Method method, @Nullable QueryParam... params) {
         request(callback, method, null, params);
