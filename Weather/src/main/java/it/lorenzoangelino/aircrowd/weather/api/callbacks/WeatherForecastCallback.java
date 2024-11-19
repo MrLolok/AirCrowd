@@ -1,7 +1,7 @@
 package it.lorenzoangelino.aircrowd.weather.api.callbacks;
 
 import it.lorenzoangelino.aircrowd.weather.api.responses.WeatherForecastResponse;
-import it.lorenzoangelino.aircrowd.weather.mapper.Mapper;
+import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 

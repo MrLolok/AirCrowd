@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.weather.config.defaults;
+package it.lorenzoangelino.aircrowd.weather.configs;
 
 import java.util.concurrent.TimeUnit;
 

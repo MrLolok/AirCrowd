@@ -1,6 +1,6 @@
 package it.lorenzoangelino.aircrowd.weather;
 
-import it.lorenzoangelino.aircrowd.weather.config.ConfigProvider;
+import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
 import it.lorenzoangelino.aircrowd.weather.entities.WeatherLocation;
 import it.lorenzoangelino.aircrowd.weather.publisher.WeatherPublisher;
 import it.lorenzoangelino.aircrowd.weather.publisher.WeatherPublisherImpl;

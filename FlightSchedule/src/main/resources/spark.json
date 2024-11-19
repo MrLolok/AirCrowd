@@ -1,0 +1,15 @@
+{
+  "appName": "AirCrowd Flight Schedule Service",
+  "master": "local[*]",
+  "config": {
+    "spark.sql.catalog.hive_catalog": "org.apache.iceberg.spark.SparkCatalog",
+    "spark.sql.catalog.hive_catalog.type": "hive",
+    "spark.sql.catalog.hive_catalog.uri": "thrift://metastore_host:9083",
+    "spark.executor.memory": "4g",
+    "spark.driver.memory": "4g",
+    "spark.sql.shuffle.partitions": "200",
+    "spark.sql.adaptive.enabled": "true",
+    "spark.sql.files.maxPartitionBytes": "128MB",
+    "spark.sql.parquet.compression.codec": "snappy"
+  }
+}

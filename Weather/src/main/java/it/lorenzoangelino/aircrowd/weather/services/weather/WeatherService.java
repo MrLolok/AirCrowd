@@ -1,7 +1,7 @@
 package it.lorenzoangelino.aircrowd.weather.services.weather;
 
-import it.lorenzoangelino.aircrowd.weather.config.ConfigProvider;
-import it.lorenzoangelino.aircrowd.weather.config.defaults.ConfigOpenMeteoAPISettings;
+import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
+import it.lorenzoangelino.aircrowd.weather.configs.ConfigOpenMeteoAPISettings;
 import it.lorenzoangelino.aircrowd.weather.entities.WeatherData;
 import it.lorenzoangelino.aircrowd.weather.entities.WeatherDataForecast;
 import it.lorenzoangelino.aircrowd.weather.entities.WeatherLocation;

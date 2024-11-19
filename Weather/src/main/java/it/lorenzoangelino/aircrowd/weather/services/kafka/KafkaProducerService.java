@@ -1,7 +1,7 @@
 package it.lorenzoangelino.aircrowd.weather.services.kafka;
 
-import it.lorenzoangelino.aircrowd.weather.config.ConfigProvider;
-import it.lorenzoangelino.aircrowd.weather.config.defaults.ConfigKafkaSettings;
+import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
+import it.lorenzoangelino.aircrowd.weather.configs.ConfigKafkaSettings;
 import it.lorenzoangelino.aircrowd.weather.entities.IdentifiableEntity;
 import org.apache.kafka.clients.producer.RecordMetadata;
 

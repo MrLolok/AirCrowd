@@ -1,7 +1,7 @@
 package it.lorenzoangelino.aircrowd.weather.services.kafka;
 
+import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
 import it.lorenzoangelino.aircrowd.weather.entities.IdentifiableEntity;
-import it.lorenzoangelino.aircrowd.weather.mapper.Mapper;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;

@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.weather.config;
+package it.lorenzoangelino.aircrowd.common.configs;
 
 public interface ConfigProvider {
     ConfigProvider INSTANCE = new ConfigProviderImpl();

@@ -1,7 +1,7 @@
-package it.lorenzoangelino.aircrowd.weather.config;
+package it.lorenzoangelino.aircrowd.common.configs;
 
-import it.lorenzoangelino.aircrowd.weather.mapper.Mapper;
-import it.lorenzoangelino.aircrowd.weather.utils.FileUtils;
+import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
+import it.lorenzoangelino.aircrowd.common.utils.FileUtils;
 
 import java.io.File;
 

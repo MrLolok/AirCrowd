@@ -1,6 +1,6 @@
-package it.lorenzoangelino.aircrowd.weather.utils;
+package it.lorenzoangelino.aircrowd.common.utils;
 
-import it.lorenzoangelino.aircrowd.weather.config.ConfigProvider;
+import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

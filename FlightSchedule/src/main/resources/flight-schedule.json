@@ -1,0 +1,4 @@
+{
+  "source": "data/flights.xlsx",
+  "destination": "hive_catalog.db_name.flight_schedule"
+}
