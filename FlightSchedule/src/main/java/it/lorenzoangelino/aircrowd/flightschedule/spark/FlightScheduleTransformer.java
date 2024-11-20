@@ -1,9 +1,12 @@
-package it.lorenzoangelino.aircrowd.flightschedule.spark.transformers;
+package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
 import it.lorenzoangelino.aircrowd.common.models.flights.enums.FlightType;
+import it.lorenzoangelino.aircrowd.common.spark.SparkTransformer;
+import it.lorenzoangelino.aircrowd.flightschedule.spark.udfs.FlightCodeGeneratorUDF;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.DataTypes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +23,7 @@ public class FlightScheduleTransformer implements SparkTransformer {
 
     @Override
     public Dataset<Row> transform(Dataset<Row> dataset) {
+        registerUDFS(dataset);
         Dataset<Row> cleaned = removeUnusedColumns(dataset);
         Dataset<Row> renamed = renameRemainingOldColumns(cleaned);
         Dataset<Row> sorted = sortFlights(renamed);
@@ -32,6 +36,16 @@ public class FlightScheduleTransformer implements SparkTransformer {
         if (removeNameOfDay)
             result = removeNameOfDay(result);
         return result;
+    }
+
+    /**
+     * Registra le UDFs necessarie alla trasformazione del dataset.
+     */
+    private void registerUDFS(Dataset<Row> dataset) {
+        dataset
+            .sparkSession()
+            .udf()
+            .register("generateFlightCode", new FlightCodeGeneratorUDF(), DataTypes.StringType);
     }
 
     /**

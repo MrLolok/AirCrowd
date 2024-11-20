@@ -1,12 +1,14 @@
 package it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.impl;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import it.lorenzoangelino.aircrowd.common.models.flights.FlightFlowData;
 import it.lorenzoangelino.aircrowd.prediction.calculators.Calculator;
-import it.lorenzoangelino.aircrowd.prediction.calculators.WeatherCriticalityCalculator;
+import it.lorenzoangelino.aircrowd.prediction.calculators.FlightFlowCriticalityCalculator;
 import it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.AbstractIndividualCondition;
 
+@JsonTypeName("FlightFlowCondition")
 public class FlightFlowCondition extends AbstractIndividualCondition<FlightFlowData> {
-    private final static Calculator<FlightFlowData, Float> FLIGHT_FLOW_CRITICALITY_CALCULATOR = new WeatherCriticalityCalculator();
+    private final static Calculator<FlightFlowData, Float> FLIGHT_FLOW_CRITICALITY_CALCULATOR = new FlightFlowCriticalityCalculator();
 
     public FlightFlowCondition(FlightFlowData data) {
         super(data);

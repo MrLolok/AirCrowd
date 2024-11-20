@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.flightschedule.spark.loaders;
+package it.lorenzoangelino.aircrowd.common.spark;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;

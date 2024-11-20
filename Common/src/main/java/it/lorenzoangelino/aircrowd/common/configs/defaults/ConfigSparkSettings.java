@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.flightschedule.configs;
+package it.lorenzoangelino.aircrowd.common.configs.defaults;
 
 import java.util.Map;
 

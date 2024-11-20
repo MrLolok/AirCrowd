@@ -1,11 +1,13 @@
 package it.lorenzoangelino.aircrowd.prediction.model.criticality;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import it.lorenzoangelino.aircrowd.prediction.model.criticality.enums.CriticalityLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
+@JsonTypeName("SimpleCriticalityScore")
 @NoArgsConstructor
 @Getter @Setter
 public class SimpleCriticalityScore implements CriticalityScore {

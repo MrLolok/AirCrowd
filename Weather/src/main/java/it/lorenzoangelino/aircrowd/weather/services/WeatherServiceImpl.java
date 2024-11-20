@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.weather.services.weather;
+package it.lorenzoangelino.aircrowd.weather.services;
 
 import it.lorenzoangelino.aircrowd.weather.api.clients.APIClientRequester;
 import it.lorenzoangelino.aircrowd.weather.api.clients.HttpAPIClientRequester;

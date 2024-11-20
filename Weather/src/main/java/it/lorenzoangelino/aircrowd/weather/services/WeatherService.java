@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.weather.services.weather;
+package it.lorenzoangelino.aircrowd.weather.services;
 
 import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;

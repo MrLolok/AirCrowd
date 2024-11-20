@@ -1,5 +1,6 @@
-package it.lorenzoangelino.aircrowd.flightschedule.spark.extractors;
+package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
+import it.lorenzoangelino.aircrowd.common.spark.SparkExtractor;
 import it.lorenzoangelino.aircrowd.flightschedule.converters.CSVConverter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
@@ -10,7 +11,7 @@ import java.io.File;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class FlightScheduleTableExtractor implements SparkExtractor {
+public class FlightScheduleExtractor implements SparkExtractor {
     private final static CSVConverter CSV_CONVERTER = new CSVConverter();
     private final SparkSession spark;
 

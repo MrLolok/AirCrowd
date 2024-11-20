@@ -68,7 +68,8 @@ public class WeatherDataProviderImpl implements WeatherDataProvider {
 
     private @NotNull WeatherData getWeatherData(WeatherForecastResponse response, GeographicalLocation location, int index) {
         WeatherForecastResponse.HourlyData data = response.hourly();
-        return new WeatherData(location, LocalDateTime.parse(data.time().get(index), DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+        return new WeatherData(location,
+                LocalDateTime.now(), LocalDateTime.parse(data.time().get(index), DateTimeFormatter.ISO_LOCAL_DATE_TIME),
                 data.temperature().get(index), data.relativeHumidity().get(index), data.dewPoint().get(index),
                 data.precipitationProbability().get(index), data.rain().get(index), data.showers().get(index),
                 data.snowfall().get(index), data.pressure().get(index), data.cloudCover().get(index),

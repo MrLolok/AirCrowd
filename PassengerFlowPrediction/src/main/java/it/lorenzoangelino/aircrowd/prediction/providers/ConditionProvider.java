@@ -1,7 +1,16 @@
 package it.lorenzoangelino.aircrowd.prediction.providers;
 
-import java.util.Set;
+import it.lorenzoangelino.aircrowd.prediction.model.conditions.Condition;
 
-public interface ConditionProvider<T> {
-    Set<T> getCache();
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+public interface ConditionProvider {
+    Optional<Condition> getCondition(LocalDateTime start, LocalDateTime end);
+
+    default Optional<Condition> getCondition(LocalDateTime datetime) {
+        LocalDateTime start = datetime.withMinute(0).withSecond(0);
+        LocalDateTime end = start.plusHours(1);
+        return getCondition(start, end);
+    }
 }

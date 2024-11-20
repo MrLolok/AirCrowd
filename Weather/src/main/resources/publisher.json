@@ -1,5 +1,8 @@
 {
-  "delay": 0,
-  "period": 20,
-  "unit": "MINUTES"
+  "weather-data-output-topic": "weather-data",
+  "task": {
+    "delay": 0,
+    "period": 20,
+    "unit": "MINUTES"
+  }
 }

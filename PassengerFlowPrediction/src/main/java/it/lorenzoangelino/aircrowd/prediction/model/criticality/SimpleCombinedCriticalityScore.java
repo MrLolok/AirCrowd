@@ -1,10 +1,12 @@
 package it.lorenzoangelino.aircrowd.prediction.model.criticality;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+@JsonTypeName("SimpleCombinedCriticalityScore")
 @Getter
 public class SimpleCombinedCriticalityScore extends SimpleCriticalityScore implements CombinedCriticalityScore {
     private @Nullable List<CriticalityScore> criticalityScores;

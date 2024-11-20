@@ -1,5 +1,6 @@
-package it.lorenzoangelino.aircrowd.flightschedule.spark.loaders;
+package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
+import it.lorenzoangelino.aircrowd.common.spark.SparkLoader;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;

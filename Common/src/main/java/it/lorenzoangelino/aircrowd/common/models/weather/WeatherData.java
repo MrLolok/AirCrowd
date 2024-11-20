@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 public record WeatherData(
         @NotNull GeographicalLocation location,
+        @NotNull LocalDateTime creation,
         @NotNull LocalDateTime datetime,
         double temperature,
         int humidity,

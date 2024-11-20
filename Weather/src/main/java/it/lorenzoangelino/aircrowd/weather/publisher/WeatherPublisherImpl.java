@@ -2,8 +2,8 @@ package it.lorenzoangelino.aircrowd.weather.publisher;
 
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
 import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
-import it.lorenzoangelino.aircrowd.weather.services.kafka.KafkaProducerService;
-import it.lorenzoangelino.aircrowd.weather.services.weather.WeatherService;
+import it.lorenzoangelino.aircrowd.common.kafka.producer.KafkaProducerService;
+import it.lorenzoangelino.aircrowd.weather.services.WeatherService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +35,7 @@ public class WeatherPublisherImpl implements WeatherPublisher {
                 publishWeatherDataForecast(forecast);
             }
         });
-        scheduler.scheduleAtFixedRate(task, PUBLISHER_SETTINGS.delay(), PUBLISHER_SETTINGS.period(), PUBLISHER_SETTINGS.unit());
+        scheduler.scheduleAtFixedRate(task, PUBLISHER_SETTINGS.task().delay(), PUBLISHER_SETTINGS.task().period(), PUBLISHER_SETTINGS.task().unit());
         this.logger.info("Automatic weather publisher started.");
     }
 
@@ -49,6 +49,6 @@ public class WeatherPublisherImpl implements WeatherPublisher {
 
     @Override
     public void publishWeatherDataForecast(WeatherDataForecast data) {
-        data.hourlyWeatherData().forEach(kafkaProducerService::send);
+        data.hourlyWeatherData().forEach(forecast -> kafkaProducerService.send(PUBLISHER_SETTINGS.weatherDataOutputTopic(), forecast));
     }
 }

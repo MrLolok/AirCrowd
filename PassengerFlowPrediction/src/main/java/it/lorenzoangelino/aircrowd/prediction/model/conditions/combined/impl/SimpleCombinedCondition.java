@@ -1,25 +1,31 @@
-package it.lorenzoangelino.aircrowd.prediction.model.conditions.combined;
+package it.lorenzoangelino.aircrowd.prediction.model.conditions.combined.impl;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import it.lorenzoangelino.aircrowd.prediction.model.conditions.AbstractCondition;
 import it.lorenzoangelino.aircrowd.prediction.model.conditions.Condition;
+import it.lorenzoangelino.aircrowd.prediction.model.conditions.combined.CombinedCondition;
 import it.lorenzoangelino.aircrowd.prediction.model.criticality.CombinedCriticalityScore;
 import it.lorenzoangelino.aircrowd.prediction.model.criticality.SimpleCombinedCriticalityScore;
 import it.lorenzoangelino.aircrowd.prediction.model.criticality.CriticalityScore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@JsonTypeName("SimpleCombinedCondition")
+@NoArgsConstructor
 @Getter
 public class SimpleCombinedCondition extends AbstractCondition implements CombinedCondition {
-    private @NotNull List<Condition> conditions;
+    private @NotNull List<? extends Condition> conditions = new ArrayList<>();
 
-    public SimpleCombinedCondition(@NotNull List<Condition> conditions) {
+    public SimpleCombinedCondition(@NotNull List<? extends Condition> conditions) {
         setConditions(conditions);
     }
 
     @Override
-    public void setConditions(@NotNull List<Condition> conditions) {
+    public void setConditions(@NotNull List<? extends Condition> conditions) {
         this.conditions = conditions;
         updateCriticalityScore();
     }
