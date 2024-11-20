@@ -14,6 +14,7 @@
     <modules>
         <module>Common</module>
         <module>FlightSchedule</module>
+        <module>PassengerFlowPrediction</module>
         <module>Weather</module>
     </modules>
 

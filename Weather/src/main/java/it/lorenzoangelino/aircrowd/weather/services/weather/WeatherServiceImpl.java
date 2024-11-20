@@ -3,9 +3,9 @@ package it.lorenzoangelino.aircrowd.weather.services.weather;
 import it.lorenzoangelino.aircrowd.weather.api.clients.APIClientRequester;
 import it.lorenzoangelino.aircrowd.weather.api.clients.HttpAPIClientRequester;
 import it.lorenzoangelino.aircrowd.weather.api.params.QueryParam;
-import it.lorenzoangelino.aircrowd.weather.entities.WeatherData;
-import it.lorenzoangelino.aircrowd.weather.entities.WeatherDataForecast;
-import it.lorenzoangelino.aircrowd.weather.entities.WeatherLocation;
+import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
+import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
+import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
 import it.lorenzoangelino.aircrowd.weather.provider.WeatherDataProvider;
 import it.lorenzoangelino.aircrowd.weather.provider.WeatherDataProviderImpl;
 import lombok.Getter;
@@ -26,17 +26,17 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     @Override
-    public CompletableFuture<WeatherDataForecast> getWeatherForecast(WeatherLocation location) {
+    public CompletableFuture<WeatherDataForecast> getWeatherForecast(GeographicalLocation location) {
         return this.weatherDataProvider.fetchWeatherDataForecast(location);
     }
 
     @Override
-    public CompletableFuture<WeatherData> getCurrentWeather(WeatherLocation location) {
+    public CompletableFuture<WeatherData> getCurrentWeather(GeographicalLocation location) {
         return this.weatherDataProvider.fetchWeatherData(location, LocalDateTime.now());
     }
 
     @Override
-    public CompletableFuture<WeatherData> getHourlyWeather(WeatherLocation location, LocalDateTime date) {
+    public CompletableFuture<WeatherData> getHourlyWeather(GeographicalLocation location, LocalDateTime date) {
         return this.weatherDataProvider.fetchWeatherData(location, date);
     }
 

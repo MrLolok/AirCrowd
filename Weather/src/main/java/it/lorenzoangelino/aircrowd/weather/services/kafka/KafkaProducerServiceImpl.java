@@ -1,7 +1,7 @@
 package it.lorenzoangelino.aircrowd.weather.services.kafka;
 
 import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
-import it.lorenzoangelino.aircrowd.weather.entities.IdentifiableEntity;
+import it.lorenzoangelino.aircrowd.common.models.IdentifiableModel;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -34,7 +34,7 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     }
 
     @Override
-    public Future<RecordMetadata> send(IdentifiableEntity<?> entity) {
+    public Future<RecordMetadata> send(IdentifiableModel<?> entity) {
         return this.send(entity.getId().toString(), Mapper.toJson(entity));
     }
 

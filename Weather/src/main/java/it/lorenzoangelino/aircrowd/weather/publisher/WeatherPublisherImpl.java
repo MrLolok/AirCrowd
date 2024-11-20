@@ -1,7 +1,7 @@
 package it.lorenzoangelino.aircrowd.weather.publisher;
 
-import it.lorenzoangelino.aircrowd.weather.entities.WeatherDataForecast;
-import it.lorenzoangelino.aircrowd.weather.entities.WeatherLocation;
+import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
+import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
 import it.lorenzoangelino.aircrowd.weather.services.kafka.KafkaProducerService;
 import it.lorenzoangelino.aircrowd.weather.services.weather.WeatherService;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +25,7 @@ public class WeatherPublisherImpl implements WeatherPublisher {
     }
 
     @Override
-    public void startScheduledTask(WeatherLocation location) {
+    public void startScheduledTask(GeographicalLocation location) {
         this.logger.info("Starting automatic weather publisher...");
         Runnable task = () -> weatherService.getWeatherForecast(location).whenComplete((forecast, throwable) -> {
             if (throwable != null)
