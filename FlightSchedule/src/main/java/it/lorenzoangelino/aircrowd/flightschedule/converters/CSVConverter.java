@@ -42,7 +42,7 @@ public class CSVConverter implements ExtensionConverter {
     }
 
     private boolean validate(String from, String to) {
-        if (!(from.endsWith(".xls") && from.endsWith(".xlsx")))
+        if (!(from.endsWith(".xls") || from.endsWith(".xlsx")))
             throw new UnsupportedOperationException("Conversion from other file except Excel tables are not supported.");
         if (!to.endsWith(".csv"))
             throw new IllegalArgumentException("Target CSV file must end with the proper extension (.csv).");
