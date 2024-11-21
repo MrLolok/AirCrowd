@@ -16,8 +16,8 @@ public class WeatherConditionProviderImpl extends AbstractKafkaStreamsProvider i
     private final Map<String, WeatherCondition> cache;
     private final Logger logger;
 
-    public WeatherConditionProviderImpl(String topic) {
-        super(topic);
+    public WeatherConditionProviderImpl(String inputKafkaTopic) {
+        super(inputKafkaTopic);
         this.cache = new HashMap<>();
         this.logger = LogManager.getLogger(WeatherConditionProviderImpl.class);
     }
