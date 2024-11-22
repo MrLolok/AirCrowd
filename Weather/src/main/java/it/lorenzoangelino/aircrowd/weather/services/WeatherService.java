@@ -15,6 +15,10 @@ public interface WeatherService {
 
     WeatherDataProvider getWeatherDataProvider();
 
+    void startAutomaticPublishing(GeographicalLocation location);
+
+    void stopAutomaticPublishing();
+
     CompletableFuture<WeatherDataForecast> getWeatherForecast(GeographicalLocation location);
 
     CompletableFuture<WeatherData> getCurrentWeather(GeographicalLocation location);

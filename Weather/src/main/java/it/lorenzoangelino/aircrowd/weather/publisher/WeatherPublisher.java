@@ -8,9 +8,13 @@ import it.lorenzoangelino.aircrowd.weather.configs.ConfigPublisherSettings;
 public interface WeatherPublisher {
     ConfigPublisherSettings PUBLISHER_SETTINGS = ConfigProvider.getInstance().loadConfig("publisher", ConfigPublisherSettings.class);
 
-    void startScheduledTask(GeographicalLocation location);
+    void start(GeographicalLocation location);
+
+    void stop();
+
+    void shutdown();
+
+    boolean isRunning();
 
     void publishWeatherDataForecast(WeatherDataForecast data);
-
-    void stopScheduledTask();
 }
