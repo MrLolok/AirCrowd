@@ -21,7 +21,7 @@ public record FlightFlowData(@NotNull List<FlightData> flights) implements Ident
 
     public List<FlightData> getSortedFlights() {
         return flights.stream()
-            .sorted(Comparator.comparing(FlightData::time).thenComparing(FlightData::type))
+            .sorted(Comparator.comparing(FlightData::datetime).thenComparing(FlightData::type))
             .toList();
     }
 }
