@@ -10,5 +10,9 @@ public final class Weather {
         GeographicalLocation analyzedWeatherLocation = ConfigProvider.getInstance().loadConfig("location", GeographicalLocation.class);
         WeatherService service = new WeatherServiceImpl();
         service.startAutomaticPublishing(analyzedWeatherLocation);
+        service.getCurrentWeather(analyzedWeatherLocation).whenComplete((weather, throwable) -> {
+            if (throwable == null)
+                System.out.println(weather);
+        });
     }
 }
