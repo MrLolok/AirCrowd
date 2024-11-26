@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.prediction.model.criticality;
+package it.lorenzoangelino.aircrowd.prediction.models.criticality;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -18,6 +18,6 @@ public interface CombinedCriticalityScore extends CriticalityScore {
     void setCriticalityScores(List<CriticalityScore> scores);
 
     default float getCombinedCriticalityValue() {
-        return getCriticalityScores().isEmpty() ? 0f : (float) getCriticalityScores().stream().mapToDouble(CriticalityScore::getValue).sum();
+        return getCriticalityScores().isEmpty() ? 0f : (float) getCriticalityScores().stream().mapToDouble(CriticalityScore::getValue).sum() / getCriticalityScores().size();
     }
 }

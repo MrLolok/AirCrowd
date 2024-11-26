@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.prediction.model.criticality;
+package it.lorenzoangelino.aircrowd.prediction.models.criticality;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;

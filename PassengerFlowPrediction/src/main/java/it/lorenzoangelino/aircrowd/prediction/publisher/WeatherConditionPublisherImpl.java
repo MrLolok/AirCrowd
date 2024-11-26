@@ -4,7 +4,7 @@ import it.lorenzoangelino.aircrowd.common.kafka.consumer.AbstractKafkaStreamsPro
 import it.lorenzoangelino.aircrowd.common.kafka.producer.KafkaProducerService;
 import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.impl.WeatherCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.WeatherCondition;
 import it.lorenzoangelino.aircrowd.prediction.providers.WeatherConditionProviderImpl;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.logging.log4j.LogManager;

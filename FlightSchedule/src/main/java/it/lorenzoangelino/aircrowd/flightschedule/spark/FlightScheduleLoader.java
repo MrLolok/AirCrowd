@@ -13,7 +13,7 @@ public class FlightScheduleLoader implements SparkLoader {
         dataset.write()
             .format("iceberg")
             .mode(SaveMode.Overwrite)
-            .partitionBy("DATA")
+            .partitionBy("datetime")
             .save(destination);
     }
 }

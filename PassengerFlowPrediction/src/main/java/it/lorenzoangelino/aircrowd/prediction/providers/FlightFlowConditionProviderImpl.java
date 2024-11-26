@@ -1,8 +1,8 @@
 package it.lorenzoangelino.aircrowd.prediction.providers;
 
 import it.lorenzoangelino.aircrowd.common.models.flights.FlightFlowData;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.Condition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.impl.FlightFlowCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.FlightFlowCondition;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;

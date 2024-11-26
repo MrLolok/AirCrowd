@@ -1,6 +1,6 @@
-package it.lorenzoangelino.aircrowd.prediction.model.conditions;
+package it.lorenzoangelino.aircrowd.prediction.models.conditions;
 
-import it.lorenzoangelino.aircrowd.prediction.model.criticality.CriticalityScore;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.CriticalityScore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

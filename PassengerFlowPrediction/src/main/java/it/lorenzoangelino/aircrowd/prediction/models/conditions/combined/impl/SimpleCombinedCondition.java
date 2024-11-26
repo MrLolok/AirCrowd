@@ -1,12 +1,12 @@
-package it.lorenzoangelino.aircrowd.prediction.model.conditions.combined.impl;
+package it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.impl;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.AbstractCondition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.Condition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.combined.CombinedCondition;
-import it.lorenzoangelino.aircrowd.prediction.model.criticality.CombinedCriticalityScore;
-import it.lorenzoangelino.aircrowd.prediction.model.criticality.SimpleCombinedCriticalityScore;
-import it.lorenzoangelino.aircrowd.prediction.model.criticality.CriticalityScore;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.AbstractCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.CombinedCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.CombinedCriticalityScore;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.SimpleCombinedCriticalityScore;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.CriticalityScore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;

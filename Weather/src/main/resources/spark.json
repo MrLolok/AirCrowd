@@ -1,5 +1,5 @@
 {
-  "appName": "AirCrowd Passenger Flow Prediction Service",
+  "appName": "AirCrowd Weather Service",
   "master": "spark://spark-iceberg:7077",
   "config": {
     "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",

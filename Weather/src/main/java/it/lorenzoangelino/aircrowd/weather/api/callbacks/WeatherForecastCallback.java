@@ -11,7 +11,7 @@ public interface WeatherForecastCallback extends ResponseCallback {
 
     @Override
     default void onSuccess(SimpleHttpResponse response) {
-        if (response.getBody().getContentType() != ContentType.APPLICATION_JSON)
+        if (!response.getBody().getContentType().isSameMimeType(ContentType.APPLICATION_JSON))
             throw new UnsupportedOperationException("Content type of the weather forecast not supported.");
         WeatherForecastResponse weatherForecastResponse = Mapper.fromJson(response.getBodyText(), WeatherForecastResponse.class);
         accept(weatherForecastResponse);

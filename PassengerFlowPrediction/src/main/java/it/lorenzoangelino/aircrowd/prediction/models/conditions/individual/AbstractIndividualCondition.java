@@ -1,9 +1,9 @@
-package it.lorenzoangelino.aircrowd.prediction.model.conditions.individual;
+package it.lorenzoangelino.aircrowd.prediction.models.conditions.individual;
 
 import it.lorenzoangelino.aircrowd.prediction.calculators.Calculator;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.AbstractCondition;
-import it.lorenzoangelino.aircrowd.prediction.model.criticality.CriticalityScore;
-import it.lorenzoangelino.aircrowd.prediction.model.criticality.SimpleCriticalityScore;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.AbstractCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.CriticalityScore;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.SimpleCriticalityScore;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 

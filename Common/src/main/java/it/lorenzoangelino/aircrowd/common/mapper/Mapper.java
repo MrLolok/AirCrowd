@@ -2,18 +2,26 @@ package it.lorenzoangelino.aircrowd.common.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 
 public interface Mapper {
-    ObjectMapper DEFAULT_MAPPER = new ObjectMapper();
+    Logger LOGGER = LogManager.getLogger(Mapper.class);
+    ObjectMapper DEFAULT_MAPPER = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     static <T> T fromJson(String json, Class<T> clazz) {
         try {
             return DEFAULT_MAPPER.readValue(json, clazz);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(String.format("Unable to translate %s and transform it in %s.", json, clazz.getSimpleName()), e);
+            LOGGER.error("Unable to translate %s and transform it in {}.", json, e);
+            return null;
         }
     }
 
@@ -21,7 +29,8 @@ public interface Mapper {
         try {
             return DEFAULT_MAPPER.readValue(file, clazz);
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Unable to translate file %s and transform it in %s.", file.getName(), clazz.getSimpleName()), e);
+            LOGGER.error("Unable to translate file {} and transform it in {}.", file.getName(), clazz.getSimpleName(), e);
+            return null;
         }
     }
 
@@ -29,7 +38,8 @@ public interface Mapper {
         try {
             return DEFAULT_MAPPER.writeValueAsString(src);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(String.format("Unable to transform %s in a JSON string.", src.getClass().getSimpleName()), e);
+            LOGGER.error("Unable to transform {} in a JSON string.", src.getClass().getSimpleName(), e);
+            return null;
         }
     }
 }

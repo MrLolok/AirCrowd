@@ -1,9 +1,9 @@
-package it.lorenzoangelino.aircrowd.prediction.model.conditions.combined.impl;
+package it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.impl;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.combined.CombinedCondition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.impl.WeatherCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.CombinedCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.WeatherCondition;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 

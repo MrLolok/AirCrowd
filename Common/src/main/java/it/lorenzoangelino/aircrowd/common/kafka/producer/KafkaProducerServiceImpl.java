@@ -26,13 +26,13 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     @Override
     public Future<RecordMetadata> send(String topic, String key, String value) {
         ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, value);
-        this.logger.info("Sending message to topic: {}", record.topic());
         this.logger.info("Key {} - Value {}", key, value);
         return this.producer.send(record);
     }
 
     @Override
     public Future<RecordMetadata> send(String topic, IdentifiableModel<?> entity) {
+        this.logger.info("Sending message to topic: {}", topic);
         return this.send(topic, entity.getId().toString(), Mapper.toJson(entity));
     }
 

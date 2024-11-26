@@ -1,10 +1,10 @@
-package it.lorenzoangelino.aircrowd.prediction.model.conditions.individual;
+package it.lorenzoangelino.aircrowd.prediction.models.conditions.individual;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.Condition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.impl.FlightFlowCondition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.impl.WeatherCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.FlightFlowCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.WeatherCondition;
 import org.jetbrains.annotations.NotNull;
 
 @JsonTypeInfo(

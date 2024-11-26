@@ -9,6 +9,8 @@ import it.lorenzoangelino.aircrowd.weather.api.responses.WeatherForecastResponse
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
 import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.spark.sql.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,9 +20,11 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class WeatherDataProviderImpl implements WeatherDataProvider {
+    protected final Logger logger;
     private final APIClientRequester requester;
 
     public WeatherDataProviderImpl(APIClientRequester requester) {
+        this.logger = LogManager.getLogger(WeatherDataProviderImpl.class);
         this.requester = requester;
     }
 
@@ -28,6 +32,7 @@ public class WeatherDataProviderImpl implements WeatherDataProvider {
     public CompletableFuture<WeatherDataForecast> fetchWeatherDataForecast(GeographicalLocation location) {
         CompletableFuture<WeatherDataForecast> future = new CompletableFuture<>();
         WeatherForecastCallback callback = response -> {
+            this.logger.info("Elaborating API response object: {}", response.toString());
             if (RESPONSES_SETTINGS.save())
                 ResponseSaver.save(RESPONSES_SETTINGS.table(), response);
 
@@ -81,7 +86,7 @@ public class WeatherDataProviderImpl implements WeatherDataProvider {
                 data.visibility().get(index), data.windSpeed().get(index), data.windDirection().get(index));
     }
 
-    private static class ResponseSaver {
+    public static class ResponseSaver {
         private final static SparkSession SPARK_SESSION = SparkConfig.getSparkSession();
         private final static String AUTHOR_NAME = "WeatherService";
 

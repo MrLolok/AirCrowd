@@ -1,4 +1,4 @@
 {
   "weather-data-topic": "weather-data",
-  "weather-condition-topic": "weather-condition"
+  "weather-condition-topic": "weather-conditions"
 }

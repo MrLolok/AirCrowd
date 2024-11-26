@@ -1,6 +1,6 @@
 package it.lorenzoangelino.aircrowd.prediction.providers;
 
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.Condition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

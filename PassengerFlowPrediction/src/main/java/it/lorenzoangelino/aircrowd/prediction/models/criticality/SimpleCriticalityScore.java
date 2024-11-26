@@ -1,7 +1,7 @@
-package it.lorenzoangelino.aircrowd.prediction.model.criticality;
+package it.lorenzoangelino.aircrowd.prediction.models.criticality;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import it.lorenzoangelino.aircrowd.prediction.model.criticality.enums.CriticalityLevel;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.enums.CriticalityLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

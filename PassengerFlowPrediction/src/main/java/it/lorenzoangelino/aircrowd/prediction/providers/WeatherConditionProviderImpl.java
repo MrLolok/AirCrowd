@@ -1,9 +1,9 @@
 package it.lorenzoangelino.aircrowd.prediction.providers;
 
 import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.Condition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.combined.impl.SimpleCombinedCondition;
-import it.lorenzoangelino.aircrowd.prediction.model.conditions.individual.impl.WeatherCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.impl.SimpleCombinedCondition;
+import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.WeatherCondition;
 import it.lorenzoangelino.aircrowd.common.kafka.consumer.AbstractKafkaStreamsProvider;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.logging.log4j.LogManager;

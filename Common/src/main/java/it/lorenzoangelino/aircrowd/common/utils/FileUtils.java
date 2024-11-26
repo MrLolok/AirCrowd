@@ -1,8 +1,8 @@
 package it.lorenzoangelino.aircrowd.common.utils;
 
 import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 public final class FileUtils {
-    private final static Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
+    private final static Logger LOGGER = LogManager.getLogger(FileUtils.class);
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static File getFile(String parent, String name, String extension) {

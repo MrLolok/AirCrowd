@@ -1,4 +1,4 @@
-package it.lorenzoangelino.aircrowd.prediction.model.criticality.enums;
+package it.lorenzoangelino.aircrowd.prediction.models.criticality.enums;
 
 public enum CriticalityLevel {
     LOW,

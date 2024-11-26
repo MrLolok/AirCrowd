@@ -70,7 +70,7 @@ public class FlightScheduleTransformer implements SparkTransformer {
             col("DATA"),
             col("FASCIA"),
             col("CODICE"),
-            col("SEATS").desc());
+            col("seats").desc());
     }
 
     /**
@@ -105,7 +105,7 @@ public class FlightScheduleTransformer implements SparkTransformer {
         else
             return dataset.withColumn(
                 "code",
-                when(col("code").isNull().or(col("code")), callUDF("generateFlightCode")).otherwise(col("code")));
+                when(col("code").isNull(), callUDF("generateFlightCode")).otherwise(col("code")));
     }
 
     /**
