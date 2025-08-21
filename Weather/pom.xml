@@ -13,6 +13,17 @@
     <artifactId>aircrowd-weather</artifactId>
 
     <dependencies>
+        <!-- Common test dependencies are inherited from parent -->
+        
+        <!-- Additional test dependencies specific to Weather module -->
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock</artifactId>
+            <version>3.13.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Runtime Dependencies -->
         <dependency>
             <groupId>it.lorenzoangelino</groupId>
             <artifactId>aircrowd-common</artifactId>

@@ -1,32 +1,63 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
 import it.lorenzoangelino.aircrowd.common.spark.SparkETLProcess;
-import it.lorenzoangelino.aircrowd.common.spark.SparkExtractor;
-import it.lorenzoangelino.aircrowd.common.spark.SparkLoader;
-import it.lorenzoangelino.aircrowd.common.spark.SparkTransformer;
-import lombok.Getter;
-import lombok.Setter;
+import it.lorenzoangelino.aircrowd.flightschedule.exceptions.FlightScheduleException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
-@Getter
-@Setter
+@Service
+@Slf4j
+@Cacheable(cacheNames = "flight-etl-cache")
 public class FlightScheduleETLProcess implements SparkETLProcess {
-    private SparkExtractor extractor;
-    private SparkTransformer transformer;
-    private SparkLoader loader;
+    private final SparkSession sparkSession;
+    private final FlightScheduleExtractor extractor;
+    private final FlightScheduleTransformer transformer;
+    private final FlightScheduleLoader loader;
 
-    public FlightScheduleETLProcess(SparkSession spark) {
-        this.extractor = new FlightScheduleExtractor(spark);
-        this.transformer = new FlightScheduleTransformer(true, true);
-        this.loader = new FlightScheduleLoader();
+    public FlightScheduleETLProcess(
+            SparkSession sparkSession,
+            FlightScheduleExtractor extractor,
+            FlightScheduleTransformer transformer,
+            FlightScheduleLoader loader) {
+        this.sparkSession = sparkSession;
+        this.extractor = extractor;
+        this.transformer = transformer;
+        this.loader = loader;
     }
 
     @Override
-    public void process(String source, String destination) {
-        Dataset<Row> dataset = extractor.read(source);
-        dataset = transformer.transform(dataset);
-        loader.load(dataset, destination);
+    public void run(String source, String target) {
+        try {
+            LOGGER.info("Starting Flight Schedule ETL process: {} -> {}", source, target);
+
+            Dataset<Row> extracted = extractor.extract(source);
+            LOGGER.info("Extracted {} records from source", extracted.count());
+
+            Dataset<Row> transformed = transformer.transform(extracted);
+            LOGGER.info("Transformed {} records", transformed.count());
+
+            loader.load(transformed, target);
+            LOGGER.info("Successfully loaded data to target: {}", target);
+
+        } catch (Exception e) {
+            LOGGER.error("ETL process failed for source: {} target: {}", source, target, e);
+            throw new FlightScheduleException("ETL process failed", e);
+        }
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "flight-etl-cache", allEntries = true)
+    public void cleanup() {
+        try {
+            LOGGER.info("Cleaning up ETL process resources");
+            // Additional cleanup if needed
+        } catch (Exception e) {
+            LOGGER.error("Error during ETL cleanup", e);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
-import static org.apache.spark.sql.funcitons.*;
+import static org.apache.spark.sql.functions.*;
 
 import it.lorenzoangelino.aircrowd.common.models.flights.enums.FlightType;
 import it.lorenzoangelino.aircrowd.common.spark.SparkTransformer;

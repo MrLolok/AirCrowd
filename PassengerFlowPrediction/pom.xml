@@ -13,6 +13,9 @@
     <artifactId>aircrowd-passenger-flow-prediction</artifactId>
 
     <dependencies>
+        <!-- Test dependencies are inherited from parent -->
+        
+        <!-- Runtime Dependencies -->
         <dependency>
             <groupId>it.lorenzoangelino</groupId>
             <artifactId>aircrowd-common</artifactId>

@@ -1,35 +1,55 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
-import it.lorenzoangelino.aircrowd.common.spark.SparkExtractor;
 import it.lorenzoangelino.aircrowd.flightschedule.converters.CSVConverter;
+import it.lorenzoangelino.aircrowd.flightschedule.exceptions.FlightScheduleException;
 import java.io.File;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
-public class FlightScheduleExtractor implements SparkExtractor {
-    private static final CSVConverter CSV_CONVERTER = new CSVConverter();
-    private final SparkSession spark;
+@Component
+@Slf4j
+public class FlightScheduleExtractor implements SparkDataExtractor {
+    private final SparkSession sparkSession;
+    private final CSVConverter csvConverter;
 
-    @Override
-    public Dataset<Row> read(String path) {
-        path = adjustFileFormat(path);
-        return spark.read()
-                .option("header", "true")
-                .option("inferSchema", "true")
-                .csv(path);
+    public FlightScheduleExtractor(SparkSession sparkSession, CSVConverter csvConverter) {
+        this.sparkSession = sparkSession;
+        this.csvConverter = csvConverter;
     }
 
-    private String adjustFileFormat(String path) throws UnsupportedOperationException {
-        if (path.endsWith(".csv")) return path;
-        else if (path.endsWith(".xls") || path.endsWith(".xlsx")) {
-            String to = String.format("%s.csv", path.substring(0, path.lastIndexOf("\\.")));
-            Optional<File> optional = CSV_CONVERTER.convert(path, to);
-            if (optional.isEmpty()) throw new RuntimeException();
-            return optional.get().getAbsolutePath();
-        } else throw new UnsupportedOperationException("Unable to read from this kind of file format.");
+    @Override
+    @Cacheable(cacheNames = "flight-extract-cache", key = "#source")
+    public Dataset<Row> extract(String source) {
+        LOGGER.info("Extracting data from source: {}", source);
+
+        try {
+            if (source.endsWith(".csv")) {
+                return sparkSession
+                        .read()
+                        .option("header", "true")
+                        .option("inferSchema", "true")
+                        .csv(source);
+            } else if (source.endsWith(".xlsx")) {
+                Optional<File> csvFile = csvConverter.convertToCsv(source);
+                if (csvFile.isEmpty()) {
+                    throw new FlightScheduleException("Failed to convert XLSX to CSV: " + source);
+                }
+                return sparkSession
+                        .read()
+                        .option("header", "true")
+                        .option("inferSchema", "true")
+                        .csv(csvFile.get().getPath());
+            } else {
+                throw new FlightScheduleException("Unsupported file format: " + source);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to extract data from source: {}", source, e);
+            throw new FlightScheduleException("Data extraction failed", e);
+        }
     }
 }

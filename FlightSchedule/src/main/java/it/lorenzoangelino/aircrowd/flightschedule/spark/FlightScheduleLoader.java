@@ -1,19 +1,32 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
-import it.lorenzoangelino.aircrowd.common.spark.SparkLoader;
-import lombok.RequiredArgsConstructor;
+import it.lorenzoangelino.aircrowd.flightschedule.exceptions.FlightScheduleException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
-public class FlightScheduleLoader implements SparkLoader {
+@Component
+@Slf4j
+public class FlightScheduleLoader implements SparkDataLoader {
+
     @Override
+    @CacheEvict(
+            cacheNames = {"flight-etl-cache", "flight-extract-cache"},
+            allEntries = true)
     public void load(Dataset<Row> dataset, String destination) {
-        dataset.write()
-                .format("iceberg")
-                .mode(SaveMode.Overwrite)
-                .partitionBy("datetime")
-                .save(destination);
+        LOGGER.info("Loading data to destination: {}", destination);
+
+        try {
+            dataset.write().mode(SaveMode.Overwrite).option("header", "true").csv(destination);
+
+            LOGGER.info("Successfully loaded {} records to {}", dataset.count(), destination);
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to load data to destination: {}", destination, e);
+            throw new FlightScheduleException("Data loading failed", e);
+        }
     }
 }

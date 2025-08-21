@@ -11,13 +11,13 @@ services:
     volumes:
       - warehouse:/home/iceberg/warehouse
     environment:
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
-      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
     ports:
-      - 7077:7077
+      - ${SPARK_MASTER_PORT}:7077
       - 8888:8888
-      - 8081:8080
+      - ${SPARK_UI_PORT}:8080
       - 10000:10000
       - 10001:10001
 
@@ -27,11 +27,11 @@ services:
     networks:
       - aircrowd-network
     ports:
-      - 8181:8181
+      - ${ICEBERG_REST_PORT}:8181
     environment:
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
-      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
       - CATALOG_WAREHOUSE=s3://warehouse/
       - CATALOG_IO__IMPL=org.apache.iceberg.aws.s3.S3FileIO
       - CATALOG_S3_ENDPOINT=http://minio:9000
@@ -40,9 +40,9 @@ services:
     image: minio/minio
     container_name: minio
     environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
-      - MINIO_DOMAIN=minio
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_DOMAIN=${MINIO_DOMAIN}
     networks:
       aircrowd-network:
         aliases:
@@ -60,12 +60,12 @@ services:
     networks:
       - aircrowd-network
     environment:
-      - AWS_ACCESS_KEY_ID=admin
-      - AWS_SECRET_ACCESS_KEY=password
-      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
     entrypoint: >
       /bin/sh -c "
-      until (/usr/bin/mc config host add minio http://minio:9000 admin password) do echo '...waiting...' && sleep 1; done;
+      until (/usr/bin/mc config host add minio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}) do echo '...waiting...' && sleep 1; done;
       /usr/bin/mc rm -r --force minio/warehouse;
       /usr/bin/mc mb minio/warehouse;
       /usr/bin/mc policy set public minio/warehouse;
@@ -79,8 +79,8 @@ services:
     networks:
       - aircrowd-network
     ports:
-      - 9092:9092
-      - 9093:9093
+      - ${KAFKA_EXTERNAL_PORT}:9092
+      - ${KAFKA_INTERNAL_PORT}:9093
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -109,7 +109,7 @@ services:
       dockerfile: Dockerfile
     container_name: aircrowd-weather-service
     hostname: aircrowd-weather-service
-    restart: "always"
+    restart: always
     depends_on:
       kafka:
         condition: service_healthy

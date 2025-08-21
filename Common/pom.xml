@@ -13,6 +13,9 @@
     <artifactId>aircrowd-common</artifactId>
 
     <dependencies>
+        <!-- Test dependencies are inherited from parent -->
+
+        <!-- Runtime Dependencies -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>

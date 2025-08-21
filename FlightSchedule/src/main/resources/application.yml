@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: flightschedule-service
+  
+  cloud:
+    config:
+      uri: http://localhost:8888
+      username: ${CONFIG_SERVER_USERNAME:admin}
+      password: ${CONFIG_SERVER_PASSWORD:admin123}
+
+  cache:
+    type: redis
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    it.lorenzoangelino.aircrowd: INFO
+    org.springframework: WARN
+    org.apache.spark: WARN
