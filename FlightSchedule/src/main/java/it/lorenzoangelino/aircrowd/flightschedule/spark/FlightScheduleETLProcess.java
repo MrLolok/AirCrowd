@@ -10,7 +10,8 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-@Getter @Setter
+@Getter
+@Setter
 public class FlightScheduleETLProcess implements SparkETLProcess {
     private SparkExtractor extractor;
     private SparkTransformer transformer;

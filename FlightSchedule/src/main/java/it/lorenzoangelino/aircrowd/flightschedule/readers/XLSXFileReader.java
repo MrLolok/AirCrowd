@@ -1,16 +1,15 @@
 package it.lorenzoangelino.aircrowd.flightschedule.readers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.poi.ss.usermodel.*;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.ss.usermodel.*;
 
 public class XLSXFileReader implements FileReader<String[]> {
-    private final static Logger LOGGER = LogManager.getLogger(XLSXFileReader.class);
+    private static final Logger LOGGER = LogManager.getLogger(XLSXFileReader.class);
 
     @Override
     public List<String[]> read(String path) {

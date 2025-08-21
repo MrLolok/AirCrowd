@@ -6,7 +6,8 @@ import it.lorenzoangelino.aircrowd.prediction.configs.ConfigCriticalitySettings;
 import org.jetbrains.annotations.NotNull;
 
 public class WeatherCriticalityCalculator extends AbstractCriticalityCalculator<WeatherData> {
-    private final static ConfigCriticalitySettings WEATHER_CRITICALITY_CONFIG = ConfigProvider.getInstance().loadConfig("weather-criticality", ConfigCriticalitySettings.class);
+    private static final ConfigCriticalitySettings WEATHER_CRITICALITY_CONFIG =
+            ConfigProvider.getInstance().loadConfig("weather-criticality", ConfigCriticalitySettings.class);
 
     @Override
     protected @NotNull ConfigCriticalitySettings getCriticalitySettings() {
@@ -15,7 +16,7 @@ public class WeatherCriticalityCalculator extends AbstractCriticalityCalculator<
 
     @Override
     protected @NotNull Double[] getNumericValues(WeatherData input) {
-        return new Double[]{
+        return new Double[] {
             input.temperature(),
             (double) input.humidity(),
             input.rain(),

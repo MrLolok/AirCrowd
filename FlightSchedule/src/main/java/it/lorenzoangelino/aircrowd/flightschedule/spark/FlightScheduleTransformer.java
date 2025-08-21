@@ -1,23 +1,22 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
+import static org.apache.spark.sql.funcitons.*;
+
 import it.lorenzoangelino.aircrowd.common.models.flights.enums.FlightType;
 import it.lorenzoangelino.aircrowd.common.spark.SparkTransformer;
 import it.lorenzoangelino.aircrowd.flightschedule.spark.udfs.FlightCodeGeneratorUDF;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataTypes;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-
-import static org.apache.spark.sql.functions.*;
-
 @RequiredArgsConstructor
 public class FlightScheduleTransformer implements SparkTransformer {
-    private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final boolean shiftDatesToday;
     private final boolean removeNameOfDay;
 
@@ -31,10 +30,8 @@ public class FlightScheduleTransformer implements SparkTransformer {
         Dataset<Row> updatedSeatsWithAverage = updateSeatsWithAverage(parsedFlightTypes);
         Dataset<Row> updatedFlightCodes = updateFlightCodes(updatedSeatsWithAverage);
         Dataset<Row> result = combineDateAndTime(updatedFlightCodes);
-        if (shiftDatesToday)
-            result = shiftDatesToToday(result);
-        if (removeNameOfDay)
-            result = removeNameOfDay(result);
+        if (shiftDatesToday) result = shiftDatesToToday(result);
+        if (removeNameOfDay) result = removeNameOfDay(result);
         return result;
     }
 
@@ -42,10 +39,7 @@ public class FlightScheduleTransformer implements SparkTransformer {
      * Registra le UDFs necessarie alla trasformazione del dataset.
      */
     private void registerUDFS(Dataset<Row> dataset) {
-        dataset
-            .sparkSession()
-            .udf()
-            .register("generateFlightCode", new FlightCodeGeneratorUDF(), DataTypes.StringType);
+        dataset.sparkSession().udf().register("generateFlightCode", new FlightCodeGeneratorUDF(), DataTypes.StringType);
     }
 
     /**
@@ -67,10 +61,7 @@ public class FlightScheduleTransformer implements SparkTransformer {
      */
     private Dataset<Row> sortFlights(Dataset<Row> dataset) {
         return dataset.orderBy(
-            col("DATA"),
-            col("FASCIA"),
-            col("CODICE"),
-            col("seats").desc());
+                col("DATA"), col("FASCIA"), col("CODICE"), col("seats").desc());
     }
 
     /**
@@ -78,22 +69,22 @@ public class FlightScheduleTransformer implements SparkTransformer {
      * e aggiorna i voli con SEATS = 0 utilizzando questa media.
      */
     private Dataset<Row> updateSeatsWithAverage(Dataset<Row> dataset) {
-        Dataset<Row> averageSeats = dataset
-            .filter("SEATS > 0")
-            .groupBy("GIORNO_NOME", "FASCIA_ORARIA")
-            .agg(avg("SEATS").alias("AVG_SEATS"));
+        Dataset<Row> averageSeats = dataset.filter("SEATS > 0")
+                .groupBy("GIORNO_NOME", "FASCIA_ORARIA")
+                .agg(avg("SEATS").alias("AVG_SEATS"));
 
         Dataset<Row> flightsWithAvg = dataset.join(
-            averageSeats,
-            dataset.col("GIORNO_NOME").equalTo(averageSeats.col("GIORNO_NOME"))
-                    .and(dataset.col("FASCIA_ORARIA").equalTo(averageSeats.col("FASCIA_ORARIA"))),
-            "left");
+                averageSeats,
+                dataset.col("GIORNO_NOME")
+                        .equalTo(averageSeats.col("GIORNO_NOME"))
+                        .and(dataset.col("FASCIA_ORARIA").equalTo(averageSeats.col("FASCIA_ORARIA"))),
+                "left");
 
         return flightsWithAvg
-            .withColumn(
-                    "SEATS",
-                    when(col("SEATS").equalTo(0), round(col("AVG_SEATS"))).otherwise(col("SEATS")))
-            .drop("AVG_SEATS");
+                .withColumn(
+                        "SEATS",
+                        when(col("SEATS").equalTo(0), round(col("AVG_SEATS"))).otherwise(col("SEATS")))
+                .drop("AVG_SEATS");
     }
 
     /**
@@ -104,36 +95,34 @@ public class FlightScheduleTransformer implements SparkTransformer {
             return dataset.withColumn("code", callUDF("generateFlightCode"));
         else
             return dataset.withColumn(
-                "code",
-                when(col("code").isNull(), callUDF("generateFlightCode")).otherwise(col("code")));
+                    "code",
+                    when(col("code").isNull(), callUDF("generateFlightCode")).otherwise(col("code")));
     }
 
     /**
      * Traduci il "codice" della tipologia nella reale tipologia del volo.
      */
     private Dataset<Row> parseFlightType(Dataset<Row> dataset) {
-        return dataset
-            .withColumn(
-                "type",
-                when(col("CODICE").equalTo("A"), FlightType.ARRIVAL.name())
-                    .when(col("CODICE").equalTo("P"), FlightType.DEPARTURE.name())
-                    .otherwise(FlightType.UNKNOWN.name()))
-            .drop("CODICE");
+        return dataset.withColumn(
+                        "type",
+                        when(col("CODICE").equalTo("A"), FlightType.ARRIVAL.name())
+                                .when(col("CODICE").equalTo("P"), FlightType.DEPARTURE.name())
+                                .otherwise(FlightType.UNKNOWN.name()))
+                .drop("CODICE");
     }
 
     /**
      * Combina la colonna "DATA" con la colonna "FASCIA_ORARIA" per creare un LocalDateTime.
      */
     private Dataset<Row> combineDateAndTime(Dataset<Row> dataset) {
-        return dataset
-            .withColumn(
-                "datetime",
-                concat(
-                    date_format(to_date(col("DATA"), "dd/MM/yyyy"), "yyyy-MM-dd"),
-                    lit("T"),
-                    format_string("%02d", col("FASCIA_ORARIA")),
-                    lit(":00:00")))
-            .drop("DATE", "FASCIA_ORARIA");
+        return dataset.withColumn(
+                        "datetime",
+                        concat(
+                                date_format(to_date(col("DATA"), "dd/MM/yyyy"), "yyyy-MM-dd"),
+                                lit("T"),
+                                format_string("%02d", col("FASCIA_ORARIA")),
+                                lit(":00:00")))
+                .drop("DATE", "FASCIA_ORARIA");
     }
 
     /**
@@ -150,13 +139,11 @@ public class FlightScheduleTransformer implements SparkTransformer {
         int firstDayOfWeek = getDayOfWeek(firstDayName);
         int todayDayOfWeek = today.getDayOfWeek().getValue();
         int weekDaysDifference = todayDayOfWeek - firstDayOfWeek;
-        if (weekDaysDifference < 0)
-            weekDaysDifference += 7;
+        if (weekDaysDifference < 0) weekDaysDifference += 7;
         daysDifference += weekDaysDifference;
 
         return dataset.withColumn(
-                "DATA",
-                date_format(date_add(to_date(col("DATA"), "dd/MM/yyyy"),daysDifference), "dd/MM/yyyy"));
+                "DATA", date_format(date_add(to_date(col("DATA"), "dd/MM/yyyy"), daysDifference), "dd/MM/yyyy"));
     }
 
     /**

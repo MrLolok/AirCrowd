@@ -7,11 +7,12 @@ import it.lorenzoangelino.aircrowd.prediction.configs.ConfigCriticalitySettings;
 import org.jetbrains.annotations.NotNull;
 
 public class FlightFlowCriticalityCalculator extends AbstractCriticalityCalculator<FlightFlowData> {
-    private final static ConfigCriticalitySettings FLIGHT_FLOW_CRITICALITY_CONFIG = ConfigProvider.getInstance().loadConfig("flight-flow-criticality", ConfigCriticalitySettings.class);
+    private static final ConfigCriticalitySettings FLIGHT_FLOW_CRITICALITY_CONFIG =
+            ConfigProvider.getInstance().loadConfig("flight-flow-criticality", ConfigCriticalitySettings.class);
 
     @Override
     protected @NotNull Double[] getNumericValues(FlightFlowData input) {
-        return new Double[]{
+        return new Double[] {
             (double) input.flights().stream().mapToInt(FlightData::seats).sum()
         };
     }

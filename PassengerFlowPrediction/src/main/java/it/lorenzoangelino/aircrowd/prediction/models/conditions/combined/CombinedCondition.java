@@ -5,20 +5,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.impl.SimpleCombinedCondition;
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.impl.WeatherForecastCondition;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    property = "type"
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = SimpleCombinedCondition.class, name = "SimpleCombinedCondition"),
     @JsonSubTypes.Type(value = WeatherForecastCondition.class, name = "WeatherForecastCondition")
 })
 public interface CombinedCondition extends Condition {
-    @NotNull List<? extends Condition> getConditions();
+    @NotNull
+    List<? extends Condition> getConditions();
 
     void setConditions(@NotNull List<? extends Condition> individualConditions);
 }

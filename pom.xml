@@ -19,8 +19,9 @@
     </modules>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
+        <maven.compiler.release>24</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -36,35 +37,78 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <release>${maven.compiler.release}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.38</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <!-- Spotless - Auto-format -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.46.1</version>
+                <configuration>
+                    <java>
+                        <palantirJavaFormat>
+                            <version>2.68.0</version>
+                        </palantirJavaFormat>
+                        <removeUnusedImports/>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                    </java>
+                </configuration>
                 <executions>
+                    <!-- Applica formattazione prima della compilazione -->
                     <execution>
-                        <phase>package</phase>
+                        <id>spotless-apply</id>
+                        <phase>process-sources</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                    <!-- Verifica formattazione durante la compilazione -->
+                    <execution>
+                        <id>spotless-check</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Surefire Plugin (tests) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.3</version>
                 <configuration>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>**/Log4j2Plugins.dat</exclude>
-                            </excludes>
-                        </filter>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
+                    <!-- Fallisce il build se ci sono test che falliscono -->
+                    <failIfNoTests>false</failIfNoTests>
+                    <testFailureIgnore>false</testFailureIgnore>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                    </includes>
                 </configuration>
+            </plugin>
+
+            <!-- SonarQube -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>5.1.0.4751</version>
             </plugin>
         </plugins>
     </build>
@@ -74,7 +118,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.13</artifactId>
-            <version>4.0.0-preview2</version>
+            <version>4.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
@@ -89,7 +133,7 @@
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.13</artifactId>
-            <version>4.0.0-preview2</version>
+            <version>4.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.jdo</groupId>
@@ -102,30 +146,30 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.24.1</version>
+            <version>2.25.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.24.1</version>
+            <version>2.25.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>2.24.1</version>
+            <artifactId>log4j-slf4j2-impl</artifactId>
+            <version>2.25.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.16</version>
+            <version>2.1.0-alpha1</version>
         </dependency>
 
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>1.18.38</version>
             <scope>provided</scope>
         </dependency>
         <!-- JetBrains Annotations -->
@@ -136,4 +180,60 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <!-- Clover Coverage -->
+                    <plugin>
+                        <groupId>org.openclover</groupId>
+                        <artifactId>clover-maven-plugin</artifactId>
+                        <version>4.5.2</version>
+                        <configuration>
+                            <generateHtml>true</generateHtml>
+                            <generateXml>true</generateXml>
+                            <generatePdf>true</generatePdf>
+                            <targetPercentage>80%</targetPercentage>
+                            <failOnViolation>false</failOnViolation>
+                        </configuration>
+                        <executions>
+                            <!-- Instrument prima dei test -->
+                            <execution>
+                                <id>clover-instrument</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>instrument</goal>
+                                </goals>
+                            </execution>
+                            <!-- Genera report dopo i test -->
+                            <execution>
+                                <id>clover-report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>clover</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>no-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

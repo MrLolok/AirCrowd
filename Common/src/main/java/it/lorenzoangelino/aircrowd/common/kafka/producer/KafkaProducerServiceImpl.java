@@ -2,15 +2,14 @@ package it.lorenzoangelino.aircrowd.common.kafka.producer;
 
 import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
 import it.lorenzoangelino.aircrowd.common.models.IdentifiableModel;
+import java.util.Properties;
+import java.util.concurrent.Future;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Properties;
-import java.util.concurrent.Future;
 
 public class KafkaProducerServiceImpl implements KafkaProducerService {
     private final Logger logger;
@@ -39,16 +38,19 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     @Override
     public void close() {
         this.logger.info("Closing Kafka producer...");
-        if (this.producer != null)
-            this.producer.close();
+        if (this.producer != null) this.producer.close();
         this.logger.info("Kafka producer closed.");
     }
 
     private Properties getProperties() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_SETTINGS.bootstrapServers());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KAFKA_SETTINGS.producer().keySerializer());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KAFKA_SETTINGS.producer().valueSerializer());
+        props.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                KAFKA_SETTINGS.producer().keySerializer());
+        props.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                KAFKA_SETTINGS.producer().valueSerializer());
         return props;
     }
 }

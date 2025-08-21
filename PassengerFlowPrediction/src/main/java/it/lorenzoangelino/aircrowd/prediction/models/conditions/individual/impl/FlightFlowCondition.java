@@ -8,7 +8,8 @@ import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.Abstr
 
 @JsonTypeName("FlightFlowCondition")
 public class FlightFlowCondition extends AbstractIndividualCondition<FlightFlowData> {
-    private final static Calculator<FlightFlowData, Float> FLIGHT_FLOW_CRITICALITY_CALCULATOR = new FlightFlowCriticalityCalculator();
+    private static final Calculator<FlightFlowData, Float> FLIGHT_FLOW_CRITICALITY_CALCULATOR =
+            new FlightFlowCriticalityCalculator();
 
     public FlightFlowCondition(FlightFlowData data) {
         super(data);

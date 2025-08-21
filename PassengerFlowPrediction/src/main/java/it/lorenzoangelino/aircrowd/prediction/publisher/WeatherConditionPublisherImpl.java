@@ -15,7 +15,8 @@ public class WeatherConditionPublisherImpl extends AbstractKafkaStreamsProvider 
     private final KafkaProducerService kafkaProducerService;
     private final Logger logger;
 
-    public WeatherConditionPublisherImpl(String inputTopic, String outputTopic, KafkaProducerService kafkaProducerService) {
+    public WeatherConditionPublisherImpl(
+            String inputTopic, String outputTopic, KafkaProducerService kafkaProducerService) {
         super(inputTopic);
         this.topic = outputTopic;
         this.kafkaProducerService = kafkaProducerService;
@@ -24,10 +25,9 @@ public class WeatherConditionPublisherImpl extends AbstractKafkaStreamsProvider 
 
     @Override
     protected void setup(KStream<String, String> stream) {
-        stream
-            .mapValues(value -> Mapper.fromJson(value, WeatherData.class))
-            .mapValues(WeatherCondition::new)
-            .foreach(this::publish);
+        stream.mapValues(value -> Mapper.fromJson(value, WeatherData.class))
+                .mapValues(WeatherCondition::new)
+                .foreach(this::publish);
     }
 
     @Override

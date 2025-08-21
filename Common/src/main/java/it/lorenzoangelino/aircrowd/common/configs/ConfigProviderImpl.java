@@ -2,12 +2,11 @@ package it.lorenzoangelino.aircrowd.common.configs;
 
 import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
 import it.lorenzoangelino.aircrowd.common.utils.FileUtils;
-
 import java.io.File;
 
 public class ConfigProviderImpl implements ConfigProvider {
-    private final static String PARENT_CONFIG_DIR = "configs";
-    private final static String CONFIGS_EXTENSION = "json";
+    private static final String PARENT_CONFIG_DIR = "configs";
+    private static final String CONFIGS_EXTENSION = "json";
 
     @Override
     public <T> T loadConfig(String name, Class<T> clazz) {

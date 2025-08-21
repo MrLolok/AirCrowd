@@ -1,8 +1,7 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark.udfs;
 
-import org.apache.spark.sql.api.java.UDF1;
-
 import java.util.Random;
+import org.apache.spark.sql.api.java.UDF1;
 
 public class FlightCodeGeneratorUDF implements UDF1<Void, String> {
     @Override

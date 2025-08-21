@@ -6,12 +6,11 @@ import it.lorenzoangelino.aircrowd.prediction.configs.ConfigWeatherDataProviderS
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.impl.SimpleCombinedCondition;
 import it.lorenzoangelino.aircrowd.prediction.providers.*;
-import lombok.Getter;
-import org.apache.spark.sql.SparkSession;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import lombok.Getter;
+import org.apache.spark.sql.SparkSession;
 
 @Getter
 public class PassengerFlowPredictionServiceImpl implements PassengerFlowPredictionService {
@@ -19,7 +18,8 @@ public class PassengerFlowPredictionServiceImpl implements PassengerFlowPredicti
     private final FlightFlowConditionProvider flightFlowConditionProvider;
 
     public PassengerFlowPredictionServiceImpl() {
-        ConfigWeatherDataProviderSettings weatherDataProviderSettings = ConfigProvider.getInstance().loadConfig("weather-data-provider", ConfigWeatherDataProviderSettings.class);
+        ConfigWeatherDataProviderSettings weatherDataProviderSettings = ConfigProvider.getInstance()
+                .loadConfig("weather-data-provider", ConfigWeatherDataProviderSettings.class);
         String weatherConditionTopic = weatherDataProviderSettings.weatherConditionTopic();
         this.weatherConditionProvider = new WeatherConditionProviderImpl(weatherConditionTopic);
         SparkSession sparkSession = SparkConfig.getSparkSession();

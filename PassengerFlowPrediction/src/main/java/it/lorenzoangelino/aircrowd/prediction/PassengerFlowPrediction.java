@@ -15,11 +15,15 @@ import org.apache.spark.sql.SparkSession;
 
 public final class PassengerFlowPrediction {
     private final SparkSession SPARK_SESSION = SparkConfig.getSparkSession();
-    private final static KafkaProducerService KAFKA_PRODUCER_SERVICE = new KafkaProducerServiceImpl();
+    private static final KafkaProducerService KAFKA_PRODUCER_SERVICE = new KafkaProducerServiceImpl();
 
     public static void main(String[] args) {
-        ConfigWeatherDataProviderSettings weatherDataProviderSettings = ConfigProvider.getInstance().loadConfig("weather-data-provider", ConfigWeatherDataProviderSettings.class);
-        WeatherConditionPublisher weatherConditionPublisher = new WeatherConditionPublisherImpl(weatherDataProviderSettings.weatherDataTopic(), weatherDataProviderSettings.weatherConditionTopic(), KAFKA_PRODUCER_SERVICE);
+        ConfigWeatherDataProviderSettings weatherDataProviderSettings = ConfigProvider.getInstance()
+                .loadConfig("weather-data-provider", ConfigWeatherDataProviderSettings.class);
+        WeatherConditionPublisher weatherConditionPublisher = new WeatherConditionPublisherImpl(
+                weatherDataProviderSettings.weatherDataTopic(),
+                weatherDataProviderSettings.weatherConditionTopic(),
+                KAFKA_PRODUCER_SERVICE);
         weatherConditionPublisher.start();
 
         // Individual condition providers

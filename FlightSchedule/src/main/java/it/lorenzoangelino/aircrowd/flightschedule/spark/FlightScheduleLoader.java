@@ -11,9 +11,9 @@ public class FlightScheduleLoader implements SparkLoader {
     @Override
     public void load(Dataset<Row> dataset, String destination) {
         dataset.write()
-            .format("iceberg")
-            .mode(SaveMode.Overwrite)
-            .partitionBy("datetime")
-            .save(destination);
+                .format("iceberg")
+                .mode(SaveMode.Overwrite)
+                .partitionBy("datetime")
+                .save(destination);
     }
 }

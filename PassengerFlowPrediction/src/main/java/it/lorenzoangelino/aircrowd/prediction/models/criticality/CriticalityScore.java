@@ -5,11 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import it.lorenzoangelino.aircrowd.prediction.models.criticality.enums.CriticalityLevel;
 import org.jetbrains.annotations.NotNull;
 
-
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    property = "type"
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = SimpleCriticalityScore.class, name = "SimpleCriticalityScore"),
     @JsonSubTypes.Type(value = SimpleCombinedCriticalityScore.class, name = "SimpleCombinedCriticalityScore")
@@ -19,5 +15,6 @@ public interface CriticalityScore {
 
     void setValue(float value);
 
-    @NotNull CriticalityLevel getLevel();
+    @NotNull
+    CriticalityLevel getLevel();
 }

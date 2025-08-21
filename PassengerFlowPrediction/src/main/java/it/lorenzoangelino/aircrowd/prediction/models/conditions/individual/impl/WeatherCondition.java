@@ -10,7 +10,8 @@ import lombok.Getter;
 @JsonTypeName("WeatherCondition")
 @Getter
 public class WeatherCondition extends AbstractIndividualCondition<WeatherData> {
-    private final static Calculator<WeatherData, Float> WEATHER_CRITICALITY_CALCULATOR = new WeatherCriticalityCalculator();
+    private static final Calculator<WeatherData, Float> WEATHER_CRITICALITY_CALCULATOR =
+            new WeatherCriticalityCalculator();
 
     public WeatherCondition(WeatherData data) {
         super(data);

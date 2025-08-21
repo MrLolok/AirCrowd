@@ -9,10 +9,11 @@ import org.jetbrains.annotations.NotNull;
 
 @JsonTypeName("SimpleCriticalityScore")
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 public class SimpleCriticalityScore implements CriticalityScore {
     // Maximum criticality
-    private final static CriticalityLevel DEFAULT_CRITICALITY_LEVEL = CriticalityLevel.SEVERE;
+    private static final CriticalityLevel DEFAULT_CRITICALITY_LEVEL = CriticalityLevel.SEVERE;
     private float value = 0f;
 
     public SimpleCriticalityScore(float score) {
@@ -23,9 +24,7 @@ public class SimpleCriticalityScore implements CriticalityScore {
         float score = Math.max(0, Math.min(1, this.value));
         int levels = CriticalityLevel.values().length;
         float offset = 1F / levels;
-        for (int i = 0; i < levels; i++)
-            if (score < offset * (i + 1))
-                return CriticalityLevel.values()[i];
+        for (int i = 0; i < levels; i++) if (score < offset * (i + 1)) return CriticalityLevel.values()[i];
         return DEFAULT_CRITICALITY_LEVEL;
     }
 }

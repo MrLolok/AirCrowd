@@ -4,11 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public interface Mapper {
     Logger LOGGER = LogManager.getLogger(Mapper.class);
@@ -29,7 +28,8 @@ public interface Mapper {
         try {
             return DEFAULT_MAPPER.readValue(file, clazz);
         } catch (IOException e) {
-            LOGGER.error("Unable to translate file {} and transform it in {}.", file.getName(), clazz.getSimpleName(), e);
+            LOGGER.error(
+                    "Unable to translate file {} and transform it in {}.", file.getName(), clazz.getSimpleName(), e);
             return null;
         }
     }
@@ -38,7 +38,8 @@ public interface Mapper {
         try {
             return DEFAULT_MAPPER.writeValueAsString(src);
         } catch (JsonProcessingException e) {
-            LOGGER.error("Unable to transform {} in a JSON string.", src.getClass().getSimpleName(), e);
+            LOGGER.error(
+                    "Unable to transform {} in a JSON string.", src.getClass().getSimpleName(), e);
             return null;
         }
     }

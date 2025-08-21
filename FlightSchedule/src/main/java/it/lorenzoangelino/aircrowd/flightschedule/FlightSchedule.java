@@ -9,7 +9,8 @@ import org.apache.spark.sql.SparkSession;
 
 public final class FlightSchedule {
     public static void main(String[] args) {
-        ConfigFlightScheduleSettings settings = ConfigProvider.getInstance().loadConfig("flight-schedule", ConfigFlightScheduleSettings.class);
+        ConfigFlightScheduleSettings settings =
+                ConfigProvider.getInstance().loadConfig("flight-schedule", ConfigFlightScheduleSettings.class);
         SparkSession session = SparkConfig.getSparkSession();
         SparkETLProcess etl = new FlightScheduleETLProcess(session);
         etl.process(settings.source(), settings.destination());

@@ -1,7 +1,6 @@
 package it.lorenzoangelino.aircrowd.weather.api.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public record WeatherForecastResponse(
@@ -13,8 +12,7 @@ public record WeatherForecastResponse(
         @JsonProperty("generationtime_ms") double generationTime,
         @JsonProperty("utc_offset_seconds") int utcOffsetSeconds,
         @JsonProperty("hourly_units") HourlyUnits hourlyUnits,
-        HourlyData hourly
-) {
+        HourlyData hourly) {
     public record HourlyUnits(
             String time,
             @JsonProperty("temperature_2m") String temperature,
@@ -28,8 +26,7 @@ public record WeatherForecastResponse(
             @JsonProperty("cloud_cover") String cloudCover,
             String visibility,
             @JsonProperty("wind_speed_10m") String windSpeed,
-            @JsonProperty("wind_direction_10m") String windDirection
-    ) {}
+            @JsonProperty("wind_direction_10m") String windDirection) {}
 
     public record HourlyData(
             List<String> time,
@@ -44,6 +41,5 @@ public record WeatherForecastResponse(
             @JsonProperty("cloud_cover") List<Integer> cloudCover,
             List<Integer> visibility,
             @JsonProperty("wind_speed_10m") List<Double> windSpeed,
-            @JsonProperty("wind_direction_10m") List<Integer> windDirection
-    ) {}
+            @JsonProperty("wind_direction_10m") List<Integer> windDirection) {}
 }

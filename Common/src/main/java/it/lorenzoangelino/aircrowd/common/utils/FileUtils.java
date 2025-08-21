@@ -1,16 +1,15 @@
 package it.lorenzoangelino.aircrowd.common.utils;
 
 import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class FileUtils {
-    private final static Logger LOGGER = LogManager.getLogger(FileUtils.class);
+    private static final Logger LOGGER = LogManager.getLogger(FileUtils.class);
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static File getFile(String parent, String name, String extension) {
@@ -19,8 +18,7 @@ public final class FileUtils {
         if (!file.exists() && !file.isDirectory()) {
             file.getParentFile().mkdirs();
             try (InputStream in = ConfigProvider.class.getClassLoader().getResourceAsStream(filename)) {
-                if (in != null)
-                    Files.copy(in, file.toPath());
+                if (in != null) Files.copy(in, file.toPath());
             } catch (IOException e) {
                 LOGGER.warn(String.format("Unable to copy default content of %s.", filename));
             }

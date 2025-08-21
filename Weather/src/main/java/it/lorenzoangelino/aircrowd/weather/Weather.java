@@ -8,9 +8,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public final class Weather {
-    private final static Logger LOGGER = LogManager.getLogger(Weather.class);
+    private static final Logger LOGGER = LogManager.getLogger(Weather.class);
+
     public static void main(String[] args) {
-        GeographicalLocation analyzedWeatherLocation = ConfigProvider.getInstance().loadConfig("location", GeographicalLocation.class);
+        GeographicalLocation analyzedWeatherLocation =
+                ConfigProvider.getInstance().loadConfig("location", GeographicalLocation.class);
         LOGGER.info("Geographical location loaded: {}", analyzedWeatherLocation.toString());
 
         WeatherService service = new WeatherServiceImpl();
@@ -21,8 +23,7 @@ public final class Weather {
 
     private static void example(WeatherService service, GeographicalLocation location) {
         service.getCurrentWeather(location).whenComplete((weather, throwable) -> {
-            if (throwable == null)
-                System.out.println(weather);
+            if (throwable == null) System.out.println(weather);
         });
     }
 }

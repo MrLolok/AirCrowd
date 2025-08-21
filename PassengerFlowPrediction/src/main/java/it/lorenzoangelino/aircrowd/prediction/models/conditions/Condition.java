@@ -8,10 +8,7 @@ import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.WeatherCondition;
 import it.lorenzoangelino.aircrowd.prediction.models.criticality.CriticalityScore;
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    property = "type"
-)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = WeatherCondition.class, name = "WeatherCondition"),
     @JsonSubTypes.Type(value = FlightFlowCondition.class, name = "FlightFlowCondition"),

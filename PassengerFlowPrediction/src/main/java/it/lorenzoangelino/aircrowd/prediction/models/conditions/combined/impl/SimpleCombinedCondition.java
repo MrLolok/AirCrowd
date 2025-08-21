@@ -5,14 +5,13 @@ import it.lorenzoangelino.aircrowd.prediction.models.conditions.AbstractConditio
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.CombinedCondition;
 import it.lorenzoangelino.aircrowd.prediction.models.criticality.CombinedCriticalityScore;
-import it.lorenzoangelino.aircrowd.prediction.models.criticality.SimpleCombinedCriticalityScore;
 import it.lorenzoangelino.aircrowd.prediction.models.criticality.CriticalityScore;
+import it.lorenzoangelino.aircrowd.prediction.models.criticality.SimpleCombinedCriticalityScore;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @JsonTypeName("SimpleCombinedCondition")
 @NoArgsConstructor
@@ -31,9 +30,8 @@ public class SimpleCombinedCondition extends AbstractCondition implements Combin
     }
 
     protected CombinedCriticalityScore getCombinedCriticalityScore() {
-        List<CriticalityScore> scores = conditions.stream()
-                .map(Condition::getCriticalityScore)
-                .toList();
+        List<CriticalityScore> scores =
+                conditions.stream().map(Condition::getCriticalityScore).toList();
         return new SimpleCombinedCriticalityScore(scores);
     }
 
