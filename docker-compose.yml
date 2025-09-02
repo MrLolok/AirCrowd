@@ -103,6 +103,46 @@ services:
       timeout: 30s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: aircrowd-redis
+    hostname: aircrowd-redis
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    networks:
+      - aircrowd-network
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  discovery-service:
+    build:
+      context: DiscoveryServer
+      dockerfile: Dockerfile
+    container_name: aircrowd-discovery-service
+    hostname: aircrowd-discovery-service
+    restart: always
+    ports:
+      - "${EUREKA_PORT:-8761}:8761"
+    environment:
+      - EUREKA_HOSTNAME=aircrowd-discovery-service
+      - EUREKA_USERNAME=${EUREKA_USERNAME:-admin}
+      - EUREKA_PASSWORD=${EUREKA_PASSWORD:-admin123}
+    networks:
+      - aircrowd-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   weather-service:
     build:
       context: Weather
@@ -113,14 +153,55 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
     volumes:
       - aircrowd-weather-service:/home/app/configs
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://aircrowd-discovery-service:8761/eureka/
+      - REDIS_HOST=aircrowd-redis
+      - REDIS_PORT=6379
     networks:
       aircrowd-network:
+
+  airport-management-service:
+    build:
+      context: AirportManagement
+      dockerfile: Dockerfile
+    container_name: aircrowd-airport-management-service
+    hostname: aircrowd-airport-management-service
+    restart: always
+    ports:
+      - "${AIRPORT_MANAGEMENT_PORT:-8080}:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://aircrowd-discovery-service:8761/eureka/
+      - REDIS_HOST=aircrowd-redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DB=${POSTGRES_DB:-aircrowd}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME:-aircrowd}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-aircrowd123}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - aircrowd-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/airport-management/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   aircrowd-weather-service:
   warehouse:
+  redis-data:
 
 networks:
   aircrowd-network:

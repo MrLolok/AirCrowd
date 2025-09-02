@@ -25,7 +25,7 @@ public class FlightScheduleExtractor implements SparkDataExtractor {
     @Override
     @Cacheable(cacheNames = "flight-extract-cache", key = "#source")
     public Dataset<Row> extract(String source) {
-        LOGGER.info("Extracting data from source: {}", source);
+        log.info("Extracting data from source: {}", source);
 
         try {
             if (source.endsWith(".csv")) {
@@ -48,7 +48,7 @@ public class FlightScheduleExtractor implements SparkDataExtractor {
                 throw new FlightScheduleException("Unsupported file format: " + source);
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to extract data from source: {}", source, e);
+            log.error("Failed to extract data from source: {}", source, e);
             throw new FlightScheduleException("Data extraction failed", e);
         }
     }

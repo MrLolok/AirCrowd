@@ -1,145 +1,121 @@
 package it.lorenzoangelino.aircrowd.weather.provider;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
-import it.lorenzoangelino.aircrowd.weather.api.clients.APIClientRequester;
-import it.lorenzoangelino.aircrowd.weather.exceptions.WeatherServiceException;
+import it.lorenzoangelino.aircrowd.weather.api.clients.HttpAPIClientRequester;
+import it.lorenzoangelino.aircrowd.weather.api.params.QueryParam;
+import it.lorenzoangelino.aircrowd.weather.config.WeatherConfigurationProperties;
+import it.lorenzoangelino.aircrowd.weather.exceptions.WeatherAPIException;
+import it.lorenzoangelino.aircrowd.weather.provider.openmeteo.OpenMeteoCallback;
 import it.lorenzoangelino.aircrowd.weather.retry.RetryPolicy;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.spark.sql.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class WeatherDataProviderImpl implements WeatherDataProvider {
-    private final APIClientRequester apiClientRequester;
+
+    private final WeatherConfigurationProperties weatherConfig;
+    private final HttpAPIClientRequester httpClient;
     private final RetryPolicy retryPolicy;
+    private final ObjectMapper objectMapper;
 
-    public WeatherDataProviderImpl(
-            APIClientRequester apiClientRequester, @Autowired(required = false) RetryPolicy retryPolicy) {
-        this.apiClientRequester = apiClientRequester;
-        this.retryPolicy = retryPolicy != null ? retryPolicy : RetryPolicy.defaultPolicy();
-    }
-
-    // Rest of the implementation remains the same...
     @Override
-    @Cacheable(cacheNames = "weather-forecast", key = "#location.name + '_' + #startDate + '_' + #endDate")
-    public CompletableFuture<WeatherDataForecast> getWeatherDataForecast(
-            GeographicalLocation location, LocalDate startDate, LocalDate endDate) {
-        log.info(
-                "Fetching weather forecast for location: {}, period: {} to {}", location.getName(), startDate, endDate);
+    @Cacheable(cacheNames = "weather-forecast", key = "#location.name")
+    public CompletableFuture<WeatherDataForecast> fetchWeatherDataForecast(GeographicalLocation location) {
+        log.info("Fetching weather forecast for location: {}", location.name());
 
-        return executeWithRetry(() -> {
-            try {
-                String endpoint = buildWeatherEndpoint(location, startDate, endDate);
-
-                return apiClientRequester
-                        .request(endpoint)
-                        .thenApply(this::parseWeatherResponse)
-                        .thenApply(WeatherDataForecast::new);
-
-            } catch (Exception e) {
-                log.error("Error fetching weather data for location: {}", location.getName(), e);
-                throw new WeatherServiceException("Failed to fetch weather data", e);
-            }
-        });
+        return retryPolicy
+                .execute(() -> fetchOpenMeteoForecast(location), "fetchWeatherDataForecast")
+                .handle((forecast, throwable) -> {
+                    if (throwable != null) {
+                        log.error("Error fetching weather forecast for location: {}", location.name(), throwable);
+                        throw new WeatherAPIException("Failed to fetch weather forecast", throwable);
+                    }
+                    return forecast;
+                });
     }
 
     @Override
-    @Cacheable(cacheNames = "weather-current", key = "#location.name")
-    public CompletableFuture<Optional<WeatherData>> getCurrentWeatherData(GeographicalLocation location) {
-        return getWeatherDataForecast(location, LocalDate.now(), LocalDate.now())
-                .thenApply(forecast -> forecast.getData().stream().findFirst());
+    @Cacheable(cacheNames = "weather-current", key = "#location.name + '_' + #date.toString()")
+    public CompletableFuture<WeatherData> fetchWeatherData(GeographicalLocation location, LocalDateTime date) {
+        log.info("Fetching weather data for location: {} at date: {}", location.name(), date);
+
+        return retryPolicy
+                .execute(() -> fetchOpenMeteoCurrentWeather(location), "fetchWeatherData")
+                .handle((weatherData, throwable) -> {
+                    if (throwable != null) {
+                        log.error(
+                                "Error fetching weather data for location: {} at date: {}",
+                                location.name(),
+                                date,
+                                throwable);
+                        throw new WeatherAPIException("Failed to fetch weather data", throwable);
+                    }
+                    return weatherData;
+                });
     }
 
-    private <T> CompletableFuture<T> executeWithRetry(Supplier<CompletableFuture<T>> operation) {
-        return retryPolicy.executeAsync(operation);
-    }
+    private CompletableFuture<WeatherDataForecast> fetchOpenMeteoForecast(GeographicalLocation location) {
+        CompletableFuture<WeatherDataForecast> future = new CompletableFuture<>();
 
-    private String buildWeatherEndpoint(GeographicalLocation location, LocalDate startDate, LocalDate endDate) {
-        return String.format(
-                "/forecast?latitude=%f&longitude=%f&start_date=%s&end_date=%s&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code",
-                location.getLatitude(), location.getLongitude(), startDate, endDate);
-    }
-
-    private List<WeatherData> parseWeatherResponse(String response) {
         try {
-            JsonNode jsonNode = Mapper.DEFAULT_MAPPER.readTree(response);
-            JsonNode hourlyData = jsonNode.get("hourly");
+            // Set up API client
+            httpClient.setBaseURL(weatherConfig.openmeteo().baseUrl());
 
-            if (hourlyData == null) {
-                log.warn("No hourly data found in weather response");
-                return List.of();
-            }
+            // Prepare query parameters for OpenMeteo API
+            QueryParam[] params = {
+                new QueryParam("latitude", String.valueOf(location.latitude())),
+                new QueryParam("longitude", String.valueOf(location.longitude())),
+                new QueryParam("hourly", weatherConfig.openmeteo().hourly()),
+                new QueryParam(
+                        "forecast_days",
+                        String.valueOf(weatherConfig.openmeteo().forecastDays())),
+                new QueryParam("timezone", weatherConfig.openmeteo().timezone())
+            };
 
-            JsonNode times = hourlyData.get("time");
-            JsonNode temperatures = hourlyData.get("temperature_2m");
-            JsonNode humidity = hourlyData.get("relative_humidity_2m");
-            JsonNode windSpeeds = hourlyData.get("wind_speed_10m");
-            JsonNode weatherCodes = hourlyData.get("weather_code");
-
-            List<WeatherData> weatherDataList = new ArrayList<>();
-            int dataPoints = times.size();
-
-            for (int i = 0; i < dataPoints; i++) {
-                try {
-                    WeatherData weatherData = new WeatherData(
-                            "weather-" + UUID.randomUUID().toString(),
-                            location,
-                            parseDateTime(times.get(i).asText()),
-                            getValueAtIndex(temperatures, i),
-                            getValueAtIndex(humidity, i),
-                            getValueAtIndex(windSpeeds, i),
-                            parseWeatherConditions(getValueAtIndex(weatherCodes, i)));
-                    weatherDataList.add(weatherData);
-                } catch (Exception e) {
-                    log.warn("Failed to parse weather data at index {}: {}", i, e.getMessage());
-                }
-            }
-
-            log.info("Successfully parsed {} weather data points", weatherDataList.size());
-            return weatherDataList;
+            // Make API request
+            httpClient.get(new OpenMeteoCallback(future, location, objectMapper), "/forecast", params);
 
         } catch (Exception e) {
-            log.error("Failed to parse weather response", e);
-            throw new WeatherServiceException("Failed to parse weather API response", e);
+            log.error("Error setting up OpenMeteo API request for location: {}", location.name(), e);
+            future.completeExceptionally(new WeatherAPIException("Failed to setup API request", e));
         }
+
+        return future;
     }
 
-    // Helper methods remain the same...
-    private LocalDateTime parseDateTime(String timeStr) {
-        return LocalDateTime.parse(timeStr);
-    }
+    private CompletableFuture<WeatherData> fetchOpenMeteoCurrentWeather(GeographicalLocation location) {
+        CompletableFuture<WeatherData> future = new CompletableFuture<>();
 
-    private double getValueAtIndex(JsonNode arrayNode, int index) {
-        if (arrayNode == null || arrayNode.size() <= index) {
-            throw new IndexOutOfBoundsException("Data not available at index " + index);
+        try {
+            // Set up API client
+            httpClient.setBaseURL(weatherConfig.openmeteo().baseUrl());
+
+            // Prepare query parameters for OpenMeteo API (only current data, 1 day)
+            QueryParam[] params = {
+                new QueryParam("latitude", String.valueOf(location.latitude())),
+                new QueryParam("longitude", String.valueOf(location.longitude())),
+                new QueryParam("hourly", weatherConfig.openmeteo().hourly()),
+                new QueryParam("forecast_days", "1"),
+                new QueryParam("timezone", weatherConfig.openmeteo().timezone())
+            };
+
+            // Make API request using factory method for current weather
+            httpClient.get(OpenMeteoCallback.forCurrentWeather(future, location, objectMapper), "/forecast", params);
+
+        } catch (Exception e) {
+            log.error("Error setting up OpenMeteo API request for location: {}", location.name(), e);
+            future.completeExceptionally(new WeatherAPIException("Failed to setup API request", e));
         }
-        return arrayNode.get(index).asDouble();
-    }
 
-    private WeatherConditions parseWeatherConditions(double weatherCode) {
-        return switch ((int) weatherCode) {
-            case 0 -> WeatherConditions.CLEAR;
-            case 1, 2, 3 -> WeatherConditions.PARTLY_CLOUDY;
-            case 45, 48 -> WeatherConditions.FOG;
-            case 51, 53, 55 -> WeatherConditions.DRIZZLE;
-            case 61, 63, 65 -> WeatherConditions.RAIN;
-            case 71, 73, 75 -> WeatherConditions.SNOW;
-            case 95, 96, 99 -> WeatherConditions.THUNDERSTORM;
-            default -> WeatherConditions.CLEAR;
-        };
+        return future;
     }
 }

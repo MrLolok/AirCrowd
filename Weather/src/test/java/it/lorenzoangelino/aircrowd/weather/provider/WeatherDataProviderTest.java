@@ -10,7 +10,6 @@ import it.lorenzoangelino.aircrowd.weather.api.callbacks.WeatherForecastCallback
 import it.lorenzoangelino.aircrowd.weather.api.clients.APIClientRequester;
 import it.lorenzoangelino.aircrowd.weather.api.params.QueryParam;
 import it.lorenzoangelino.aircrowd.weather.api.responses.WeatherForecastResponse;
-import it.lorenzoangelino.aircrowd.weather.exceptions.WeatherServiceException;
 import it.lorenzoangelino.aircrowd.weather.retry.RetryPolicy;
 import java.time.LocalDateTime;
 import java.util.List;

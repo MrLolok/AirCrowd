@@ -17,6 +17,8 @@
         <module>PassengerFlowPrediction</module>
         <module>Weather</module>
         <module>ConfigServer</module>
+        <module>DiscoveryServer</module>
+        <module>AirportManagement</module>
     </modules>
 
     <properties>

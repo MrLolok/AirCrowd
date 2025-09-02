@@ -1,9 +1,11 @@
 package it.lorenzoangelino.aircrowd.common.kafka.producer;
 
-import it.lorenzoangelino.aircrowd.common.mapper.Mapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.lorenzoangelino.aircrowd.common.models.IdentifiableModel;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,12 +13,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class KafkaProducerServiceImpl implements KafkaProducerService {
     private final KafkaTemplate<String, String> kafkaTemplate;
-
-    public KafkaProducerServiceImpl(KafkaTemplate<String, String> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
+    private final ObjectMapper objectMapper;
 
     @Override
     public Future<RecordMetadata> send(String topic, String key, String value) {
@@ -37,7 +37,15 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
 
     @Override
     public Future<RecordMetadata> send(String topic, IdentifiableModel<?> entity) {
-        return send(topic, entity.getId().toString(), Mapper.toJson(entity));
+        try {
+            String json = objectMapper.writeValueAsString(entity);
+            return send(topic, entity.getId().toString(), json);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize entity: {}", entity, e);
+            CompletableFuture<RecordMetadata> failedFuture = new CompletableFuture<>();
+            failedFuture.completeExceptionally(e);
+            return failedFuture;
+        }
     }
 
     @Override

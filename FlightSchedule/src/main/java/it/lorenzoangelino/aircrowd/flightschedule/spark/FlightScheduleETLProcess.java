@@ -33,19 +33,19 @@ public class FlightScheduleETLProcess implements SparkETLProcess {
     @Override
     public void run(String source, String target) {
         try {
-            LOGGER.info("Starting Flight Schedule ETL process: {} -> {}", source, target);
+            log.info("Starting Flight Schedule ETL process: {} -> {}", source, target);
 
             Dataset<Row> extracted = extractor.extract(source);
-            LOGGER.info("Extracted {} records from source", extracted.count());
+            log.info("Extracted {} records from source", extracted.count());
 
             Dataset<Row> transformed = transformer.transform(extracted);
-            LOGGER.info("Transformed {} records", transformed.count());
+            log.info("Transformed {} records", transformed.count());
 
             loader.load(transformed, target);
-            LOGGER.info("Successfully loaded data to target: {}", target);
+            log.info("Successfully loaded data to target: {}", target);
 
         } catch (Exception e) {
-            LOGGER.error("ETL process failed for source: {} target: {}", source, target, e);
+            log.error("ETL process failed for source: {} target: {}", source, target, e);
             throw new FlightScheduleException("ETL process failed", e);
         }
     }
@@ -54,10 +54,10 @@ public class FlightScheduleETLProcess implements SparkETLProcess {
     @CacheEvict(cacheNames = "flight-etl-cache", allEntries = true)
     public void cleanup() {
         try {
-            LOGGER.info("Cleaning up ETL process resources");
+            log.info("Cleaning up ETL process resources");
             // Additional cleanup if needed
         } catch (Exception e) {
-            LOGGER.error("Error during ETL cleanup", e);
+            log.error("Error during ETL cleanup", e);
         }
     }
 }

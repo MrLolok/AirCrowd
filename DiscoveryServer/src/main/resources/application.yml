@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: discovery-server
+  
+  security:
+    user:
+      name: ${EUREKA_USERNAME:admin}
+      password: ${EUREKA_PASSWORD:admin123}
+
+server:
+  port: ${EUREKA_PORT:8761}
+
+eureka:
+  instance:
+    hostname: ${EUREKA_HOSTNAME:localhost}
+    prefer-ip-address: false
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    enable-self-preservation: ${EUREKA_SELF_PRESERVATION:true}
+    eviction-interval-timer-in-ms: 15000
+    renewal-percent-threshold: 0.85
+    response-cache-update-interval-ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,eureka
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.netflix.eureka: INFO
+    com.netflix.discovery: INFO
+    org.springframework.cloud.netflix.eureka: INFO
+    it.lorenzoangelino.aircrowd: INFO
+    org.springframework: WARN

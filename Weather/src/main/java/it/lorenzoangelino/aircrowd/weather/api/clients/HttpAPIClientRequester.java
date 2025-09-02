@@ -9,12 +9,21 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.core5.http.Method;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HttpAPIClientRequester extends HttpAPIClient implements APIClientRequester {
+
+    @PostConstruct
+    public void init() {
+        start();
+    }
+
     @Override
     public void request(@Nullable ResponseCallback callback, @NotNull Method method, @Nullable QueryParam... params) {
         request(callback, method, null, params);

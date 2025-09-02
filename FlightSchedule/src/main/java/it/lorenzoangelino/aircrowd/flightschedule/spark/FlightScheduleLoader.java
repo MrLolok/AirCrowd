@@ -17,15 +17,15 @@ public class FlightScheduleLoader implements SparkDataLoader {
             cacheNames = {"flight-etl-cache", "flight-extract-cache"},
             allEntries = true)
     public void load(Dataset<Row> dataset, String destination) {
-        LOGGER.info("Loading data to destination: {}", destination);
+        log.info("Loading data to destination: {}", destination);
 
         try {
             dataset.write().mode(SaveMode.Overwrite).option("header", "true").csv(destination);
 
-            LOGGER.info("Successfully loaded {} records to {}", dataset.count(), destination);
+            log.info("Successfully loaded {} records to {}", dataset.count(), destination);
 
         } catch (Exception e) {
-            LOGGER.error("Failed to load data to destination: {}", destination, e);
+            log.error("Failed to load data to destination: {}", destination, e);
             throw new FlightScheduleException("Data loading failed", e);
         }
     }

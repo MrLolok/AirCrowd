@@ -4,12 +4,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 
+@Slf4j
 public class XLSXFileReader implements FileReader<String[]> {
-    private static final Logger LOGGER = LogManager.getLogger(XLSXFileReader.class);
 
     @Override
     public List<String[]> read(String path) {
@@ -29,7 +28,7 @@ public class XLSXFileReader implements FileReader<String[]> {
             }
             workbook.close();
         } catch (IOException e) {
-            LOGGER.warn("IOException encountered while reading file {}", path, e);
+            log.warn("IOException encountered while reading file {}", path, e);
         }
         return data;
     }

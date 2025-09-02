@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
+@Slf4j
 public class HttpAPIClient implements APIClient {
-    protected final Logger logger;
     protected final CloseableHttpAsyncClient httpClient;
 
     @Setter
@@ -25,28 +24,27 @@ public class HttpAPIClient implements APIClient {
     protected List<QueryParam> baseQueryParams;
 
     public HttpAPIClient() {
-        this.logger = LogManager.getLogger(HttpAPIClient.class);
         this.httpClient = createHttpClient();
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
     }
 
     @Override
     public void start() {
-        this.logger.info("Start HTTP API client.");
+        log.info("Start HTTP API client.");
         if (httpClient != null) httpClient.start();
-        this.logger.info("HTTP API client has been started.");
+        log.info("HTTP API client has been started.");
     }
 
     @Override
     public void close() {
-        this.logger.info("Closing HTTP API client.");
+        log.info("Closing HTTP API client.");
         if (httpClient != null)
             try {
                 httpClient.close();
             } catch (IOException e) {
-                this.logger.error("Error closing HTTP API client.", e);
+                log.error("Error closing HTTP API client.", e);
             }
-        this.logger.info("HTTP API client has been closed.");
+        log.info("HTTP API client has been closed.");
     }
 
     private CloseableHttpAsyncClient createHttpClient() {

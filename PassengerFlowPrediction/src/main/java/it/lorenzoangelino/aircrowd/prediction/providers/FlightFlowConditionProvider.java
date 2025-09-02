@@ -5,13 +5,12 @@ import it.lorenzoangelino.aircrowd.common.models.flights.FlightFlowData;
 import it.lorenzoangelino.aircrowd.common.models.flights.enums.FlightType;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Row;
 
 public interface FlightFlowConditionProvider extends ConditionProvider {
+    @Slf4j
     class FlightsDataExtractor {
-        private static final Logger LOGGER = LogManager.getLogger(FlightsDataExtractor.class);
 
         public static FlightFlowData extract(List<Row> rows) {
             List<FlightData> flightDataList = rows.stream()
@@ -30,7 +29,7 @@ public interface FlightFlowConditionProvider extends ConditionProvider {
             try {
                 type = FlightType.valueOf(typeRaw.toUpperCase());
             } catch (IllegalArgumentException e) {
-                LOGGER.warn("Unknown flight type {}", typeRaw);
+                log.warn("Unknown flight type {}", typeRaw);
             }
             return new FlightData(code, type, datetime, seats);
         }

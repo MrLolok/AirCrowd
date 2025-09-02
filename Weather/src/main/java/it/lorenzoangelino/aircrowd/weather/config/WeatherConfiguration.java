@@ -16,6 +16,6 @@ public class WeatherConfiguration {
 
     @Bean
     public RetryPolicy retryPolicy() {
-        return RetryPolicy.defaultPolicy();
+        return new RetryPolicy();
     }
 }
