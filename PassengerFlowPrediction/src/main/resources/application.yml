@@ -3,23 +3,11 @@ server:
 
 spring:
   application:
-    name: prediction-service
+    name: passenger-flow-prediction
   
   cloud:
     config:
       uri: http://localhost:8888
-      username: ${CONFIG_SERVER_USERNAME:admin}
-      password: ${CONFIG_SERVER_PASSWORD:admin123}
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://admin:admin123@localhost:8761/eureka/
-    fetch-registry: true
-    register-with-eureka: true
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.application.instance-id:${random.value}}
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
@@ -28,9 +16,14 @@ eureka:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       auto-offset-reset: earliest
+      enable-auto-commit: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
   cache:
     type: redis
+  data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
@@ -45,9 +38,12 @@ management:
     health:
       show-details: always
 
-logging:
-  level:
-    it.lorenzoangelino.aircrowd: INFO
-    org.springframework: WARN
-    org.apache.kafka: WARN
-    org.apache.spark: WARN
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance-id:${random.value}}

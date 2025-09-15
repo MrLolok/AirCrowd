@@ -1,0 +1,99 @@
+predictions:
+  condition-providers:
+    flight-flow:
+      table-name: flight_data
+      spark-query:
+        datetime-column: flight_time
+        columns: code, datetime, seats, type
+
+    weather:
+      kafka-topic: weather-data
+      cache-settings:
+        max-entries: 1000
+        ttl-minutes: 60
+
+  flight-flow-criticality:
+    parameters:
+      - name: passengers
+        deviation: 0.0
+        weight: 1.0
+        min-value: 0.0
+        max-value: 25000.0
+        inverted-impact: false
+    min-criticality-value: 0.0
+    max-criticality-value: 1.0
+
+  iceberg:
+    table:
+      name: predictions.passenger_flow_predictions
+      location: s3://warehouse/predictions/passenger_flow_predictions
+
+  weather-data-provider:
+    weather-data-topic: weather-data
+
+  kafka-consumer:
+    bootstrap-servers: localhost:9092
+    consumer:
+      enable-autocommit: true
+      group-id: prediction-service
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+  schedule:
+    delay: 0
+    period: 15
+    unit: MINUTES
+
+  weather-criticality:
+    parameters:
+      - name: temperature
+        deviation: 15.0
+        weight: 0.05
+        min-value: 0.0
+        max-value: 50.0
+        inverted-impact: false
+      - name: humidity
+        deviation: 0.0
+        weight: 0.075
+        min-value: 0.0
+        max-value: 100.0
+        inverted-impact: false
+      - name: rain
+        deviation: 0.0
+        weight: 0.12
+        min-value: 0.0
+        max-value: 100.0
+        inverted-impact: false
+      - name: showers
+        deviation: 0.0
+        weight: 0.03
+        min-value: 0.0
+        max-value: 100.0
+        inverted-impact: false
+      - name: snowfall
+        deviation: 0.0
+        weight: 0.2
+        min-value: 0.0
+        max-value: 100.0
+        inverted-impact: false
+      - name: cloudCover
+        deviation: 0.0
+        weight: 0.1
+        min-value: 0.0
+        max-value: 100.0
+        inverted-impact: false
+      - name: visibility
+        deviation: 0.0
+        weight: 0.25
+        min-value: 0.0
+        max-value: 10000.0
+        inverted-impact: true
+      - name: windSpeed
+        deviation: 0.0
+        weight: 0.175
+        min-value: 0.0
+        max-value: 100.0
+        inverted-impact: false
+    min-criticality-value: 0.0
+    max-criticality-value: 1.0

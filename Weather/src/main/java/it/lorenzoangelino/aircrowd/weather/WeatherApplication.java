@@ -1,20 +1,27 @@
 package it.lorenzoangelino.aircrowd.weather;
 
-import it.lorenzoangelino.aircrowd.weather.config.WeatherConfigurationProperties;
+import it.lorenzoangelino.aircrowd.common.configs.JacksonConfiguration;
+import it.lorenzoangelino.aircrowd.common.configs.SparkConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.kafka.annotation.EnableKafka;
 
-@SpringBootApplication(scanBasePackages = {"it.lorenzoangelino.aircrowd.common", "it.lorenzoangelino.aircrowd.weather"})
+@SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableConfigurationProperties(WeatherConfigurationProperties.class)
 @EnableKafka
 @EnableCaching
 @EnableDiscoveryClient
+@Import({JacksonConfiguration.class, SparkConfiguration.class})
+@ComponentScan(basePackages = {
+        "it.lorenzoangelino.aircrowd.weather",
+        "it.lorenzoangelino.aircrowd.common.kafka",
+        "it.lorenzoangelino.aircrowd.common.spark"
+})
 public class WeatherApplication {
 
     public static void main(String[] args) {

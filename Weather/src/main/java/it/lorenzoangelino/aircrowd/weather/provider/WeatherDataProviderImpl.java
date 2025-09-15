@@ -6,7 +6,6 @@ import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
 import it.lorenzoangelino.aircrowd.weather.api.clients.HttpAPIClientRequester;
 import it.lorenzoangelino.aircrowd.weather.api.params.QueryParam;
-import it.lorenzoangelino.aircrowd.weather.config.WeatherConfigurationProperties;
 import it.lorenzoangelino.aircrowd.weather.exceptions.WeatherAPIException;
 import it.lorenzoangelino.aircrowd.weather.provider.openmeteo.OpenMeteoCallback;
 import it.lorenzoangelino.aircrowd.weather.retry.RetryPolicy;
@@ -14,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +22,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WeatherDataProviderImpl implements WeatherDataProvider {
 
-    private final WeatherConfigurationProperties weatherConfig;
     private final HttpAPIClientRequester httpClient;
     private final RetryPolicy retryPolicy;
     private final ObjectMapper objectMapper;
+    
+    @Value("${weather.openmeteo.base-url}")
+    private String openmeteoBaseUrl;
+    
+    @Value("${weather.openmeteo.hourly}")
+    private String openmeteoHourly;
+    
+    @Value("${weather.openmeteo.forecast-days}")
+    private int openmeteoForecastDays;
+    
+    @Value("${weather.openmeteo.timezone}")
+    private String openmeteoTimezone;
 
     @Override
     @Cacheable(cacheNames = "weather-forecast", key = "#location.name")
@@ -68,17 +79,15 @@ public class WeatherDataProviderImpl implements WeatherDataProvider {
 
         try {
             // Set up API client
-            httpClient.setBaseURL(weatherConfig.openmeteo().baseUrl());
+            httpClient.setBaseURL(openmeteoBaseUrl);
 
             // Prepare query parameters for OpenMeteo API
             QueryParam[] params = {
                 new QueryParam("latitude", String.valueOf(location.latitude())),
                 new QueryParam("longitude", String.valueOf(location.longitude())),
-                new QueryParam("hourly", weatherConfig.openmeteo().hourly()),
-                new QueryParam(
-                        "forecast_days",
-                        String.valueOf(weatherConfig.openmeteo().forecastDays())),
-                new QueryParam("timezone", weatherConfig.openmeteo().timezone())
+                new QueryParam("hourly", openmeteoHourly),
+                new QueryParam("forecast_days", String.valueOf(openmeteoForecastDays)),
+                new QueryParam("timezone", openmeteoTimezone)
             };
 
             // Make API request
@@ -97,15 +106,15 @@ public class WeatherDataProviderImpl implements WeatherDataProvider {
 
         try {
             // Set up API client
-            httpClient.setBaseURL(weatherConfig.openmeteo().baseUrl());
+            httpClient.setBaseURL(openmeteoBaseUrl);
 
             // Prepare query parameters for OpenMeteo API (only current data, 1 day)
             QueryParam[] params = {
                 new QueryParam("latitude", String.valueOf(location.latitude())),
                 new QueryParam("longitude", String.valueOf(location.longitude())),
-                new QueryParam("hourly", weatherConfig.openmeteo().hourly()),
+                new QueryParam("hourly", openmeteoHourly),
                 new QueryParam("forecast_days", "1"),
-                new QueryParam("timezone", weatherConfig.openmeteo().timezone())
+                new QueryParam("timezone", openmeteoTimezone)
             };
 
             // Make API request using factory method for current weather

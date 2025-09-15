@@ -1,6 +1,6 @@
 package it.lorenzoangelino.aircrowd.flightschedule.converters;
 
-import it.lorenzoangelino.aircrowd.flightschedule.readers.XLSXFileReader;
+import it.lorenzoangelino.aircrowd.flightschedule.readers.FileReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,17 +9,24 @@ import java.util.Optional;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+@Component("csvConverter")
 @Slf4j
 public class CSVConverter implements ExtensionConverter {
-    private static final XLSXFileReader XLSX_FILE_READER = new XLSXFileReader();
+    private  final FileReader<String[]> xlsxFileReader;
+
+    public CSVConverter(@Qualifier("xlsxFileReader") FileReader<String[]> xlsxFileReader) {
+        this.xlsxFileReader = xlsxFileReader;
+    }
 
     @Override
     public Optional<File> convert(String from, String to) {
         File file = null;
         boolean valid = validate(from, to);
         if (valid) {
-            List<String[]> data = XLSX_FILE_READER.read(from);
+            List<String[]> data = xlsxFileReader.read(from);
             try {
                 file = writeCSV(data, to);
             } catch (IOException e) {

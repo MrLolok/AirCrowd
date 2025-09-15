@@ -1,8 +1,12 @@
 package it.lorenzoangelino.aircrowd.prediction.providers;
 
 import it.lorenzoangelino.aircrowd.common.models.flights.FlightFlowData;
+import it.lorenzoangelino.aircrowd.prediction.factories.ConditionFactory;
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
-import it.lorenzoangelino.aircrowd.prediction.models.conditions.individual.impl.FlightFlowCondition;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -11,22 +15,26 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+@Service
+@RequiredArgsConstructor
 public class FlightFlowConditionProviderImpl implements FlightFlowConditionProvider {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final String FLIGHT_DATA_TABLE_NAME = "flight_data";
 
     private final SparkSession sparkSession;
-
-    public FlightFlowConditionProviderImpl(SparkSession sparkSession) {
-        this.sparkSession = sparkSession;
-    }
+    private final ConditionFactory conditionFactory;
+    
+    @Value("${condition-providers.flight-flow.table-name}")
+    private String flightDataTableName;
+    
+    @Value("${condition-providers.flight-flow.spark-query.datetime-column}")
+    private String datetimeColumn;
 
     @Override
     public Optional<Condition> getCondition(LocalDateTime start, LocalDateTime end) {
         List<Row> rows = getFlightDataAsList(start, end);
         FlightFlowData flightFlowData = FlightsDataExtractor.extract(rows);
         if (flightFlowData.flights().isEmpty()) return Optional.empty();
-        Condition condition = new FlightFlowCondition(flightFlowData);
+        Condition condition = conditionFactory.createFlightFlowCondition(flightFlowData);
         return Optional.of(condition);
     }
 
@@ -41,8 +49,8 @@ public class FlightFlowConditionProviderImpl implements FlightFlowConditionProvi
         String startDateFormatted = start.format(DATE_TIME_FORMATTER),
                 endDateFormatted = end.format(DATE_TIME_FORMATTER);
         String query = String.format(
-                "SELECT * FROM %s WHERE flight_time >= '%s' AND flight_time <= '%s'",
-                FLIGHT_DATA_TABLE_NAME, startDateFormatted, endDateFormatted);
+                "SELECT * FROM %s WHERE %s >= '%s' AND %s <= '%s'",
+                flightDataTableName, datetimeColumn, startDateFormatted, datetimeColumn, endDateFormatted);
         return sparkSession.sql(query);
     }
 }

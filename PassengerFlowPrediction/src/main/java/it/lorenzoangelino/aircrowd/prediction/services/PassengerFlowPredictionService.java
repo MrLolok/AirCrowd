@@ -1,11 +1,12 @@
 package it.lorenzoangelino.aircrowd.prediction.services;
 
+import it.lorenzoangelino.aircrowd.common.models.predictions.PassengerFlowPrediction;
 import it.lorenzoangelino.aircrowd.prediction.providers.ConditionProvider;
-import it.lorenzoangelino.aircrowd.prediction.providers.FlightFlowConditionProvider;
-import it.lorenzoangelino.aircrowd.prediction.providers.WeatherConditionProvider;
+import org.springframework.cache.annotation.Cacheable;
+
+import java.time.LocalDateTime;
 
 public interface PassengerFlowPredictionService extends ConditionProvider {
-    WeatherConditionProvider getWeatherConditionProvider();
-
-    FlightFlowConditionProvider getFlightFlowConditionProvider();
+    @Cacheable(cacheNames = "prediction-results", key = "#start + '_' + #end")
+    PassengerFlowPrediction predictPassengerFlow(LocalDateTime start, LocalDateTime end);
 }

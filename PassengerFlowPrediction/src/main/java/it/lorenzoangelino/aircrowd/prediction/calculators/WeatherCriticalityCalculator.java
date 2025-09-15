@@ -1,17 +1,21 @@
 package it.lorenzoangelino.aircrowd.prediction.calculators;
 
-import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
 import it.lorenzoangelino.aircrowd.prediction.configs.ConfigCriticalitySettings;
+import it.lorenzoangelino.aircrowd.prediction.services.CriticalityConfigurationService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class WeatherCriticalityCalculator extends AbstractCriticalityCalculator<WeatherData> {
-    private static final ConfigCriticalitySettings WEATHER_CRITICALITY_CONFIG =
-            ConfigProvider.getInstance().loadConfig("weather-criticality", ConfigCriticalitySettings.class);
+
+    private final CriticalityConfigurationService configService;
 
     @Override
     protected @NotNull ConfigCriticalitySettings getCriticalitySettings() {
-        return WEATHER_CRITICALITY_CONFIG;
+        return configService.getWeatherCriticalitySettings();
     }
 
     @Override

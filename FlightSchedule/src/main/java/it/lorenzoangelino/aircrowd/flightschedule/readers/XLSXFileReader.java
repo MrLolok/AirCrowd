@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component("xlsxFileReader")
 public class XLSXFileReader implements FileReader<String[]> {
 
     @Override

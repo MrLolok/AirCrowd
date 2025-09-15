@@ -1,0 +1,12 @@
+spark:
+  master: local[*]
+  app-name: AirCrowd-Default
+
+  warehouse:
+    path: file:///tmp/spark-warehouse
+  
+  # Memory Management
+  executor:
+    memory: 2g
+  driver:
+    memory: 1g

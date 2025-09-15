@@ -1,6 +1,7 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
-import it.lorenzoangelino.aircrowd.flightschedule.converters.CSVConverter;
+import it.lorenzoangelino.aircrowd.common.spark.SparkDataExtractor;
+import it.lorenzoangelino.aircrowd.flightschedule.converters.ExtensionConverter;
 import it.lorenzoangelino.aircrowd.flightschedule.exceptions.FlightScheduleException;
 import java.io.File;
 import java.util.Optional;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -15,9 +17,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FlightScheduleExtractor implements SparkDataExtractor {
     private final SparkSession sparkSession;
-    private final CSVConverter csvConverter;
+    private final ExtensionConverter csvConverter;
 
-    public FlightScheduleExtractor(SparkSession sparkSession, CSVConverter csvConverter) {
+    public FlightScheduleExtractor(SparkSession sparkSession, @Qualifier("csvConverter") ExtensionConverter csvConverter) {
         this.sparkSession = sparkSession;
         this.csvConverter = csvConverter;
     }
@@ -35,7 +37,7 @@ public class FlightScheduleExtractor implements SparkDataExtractor {
                         .option("inferSchema", "true")
                         .csv(source);
             } else if (source.endsWith(".xlsx")) {
-                Optional<File> csvFile = csvConverter.convertToCsv(source);
+                Optional<File> csvFile = csvConverter.convert(source, source.replace(".xlsx", ".csv"));
                 if (csvFile.isEmpty()) {
                     throw new FlightScheduleException("Failed to convert XLSX to CSV: " + source);
                 }

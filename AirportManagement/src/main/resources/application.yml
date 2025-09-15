@@ -1,12 +1,6 @@
 spring:
   application:
     name: airport-management-service
-  
-  cloud:
-    config:
-      uri: http://localhost:8888
-      username: ${CONFIG_SERVER_USERNAME:admin}
-      password: ${CONFIG_SERVER_PASSWORD:admin123}
 
   # Database Configuration (PostgreSQL for operational data)
   datasource:
@@ -59,6 +53,3 @@ logging:
     org.springframework: WARN
     org.hibernate: WARN
     org.springframework.web: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

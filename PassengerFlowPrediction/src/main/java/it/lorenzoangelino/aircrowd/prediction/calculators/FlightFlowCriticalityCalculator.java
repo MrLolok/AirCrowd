@@ -1,14 +1,18 @@
 package it.lorenzoangelino.aircrowd.prediction.calculators;
 
-import it.lorenzoangelino.aircrowd.common.configs.ConfigProvider;
 import it.lorenzoangelino.aircrowd.common.models.flights.FlightData;
 import it.lorenzoangelino.aircrowd.common.models.flights.FlightFlowData;
 import it.lorenzoangelino.aircrowd.prediction.configs.ConfigCriticalitySettings;
+import it.lorenzoangelino.aircrowd.prediction.services.CriticalityConfigurationService;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class FlightFlowCriticalityCalculator extends AbstractCriticalityCalculator<FlightFlowData> {
-    private static final ConfigCriticalitySettings FLIGHT_FLOW_CRITICALITY_CONFIG =
-            ConfigProvider.getInstance().loadConfig("flight-flow-criticality", ConfigCriticalitySettings.class);
+
+    private final CriticalityConfigurationService configService;
 
     @Override
     protected @NotNull Double[] getNumericValues(FlightFlowData input) {
@@ -19,6 +23,6 @@ public class FlightFlowCriticalityCalculator extends AbstractCriticalityCalculat
 
     @Override
     protected @NotNull ConfigCriticalitySettings getCriticalitySettings() {
-        return FLIGHT_FLOW_CRITICALITY_CONFIG;
+        return configService.getFlightFlowCriticalitySettings();
     }
 }

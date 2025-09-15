@@ -3,11 +3,11 @@ package it.lorenzoangelino.aircrowd.weather.controller;
 import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
-import it.lorenzoangelino.aircrowd.weather.config.WeatherConfigurationProperties;
 import it.lorenzoangelino.aircrowd.weather.services.WeatherService;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class WeatherController {
 
     private final WeatherService weatherService;
-    private final WeatherConfigurationProperties weatherConfig;
+    
+    @Value("${weather.location.name}")
+    private String locationName;
+    
+    @Value("${weather.location.latitude}")
+    private double locationLatitude;
+    
+    @Value("${weather.location.longitude}")
+    private double locationLongitude;
 
     @GetMapping("/current")
     public WeatherData getCurrentWeather() {
@@ -28,9 +36,9 @@ public class WeatherController {
 
         try {
             GeographicalLocation location = new GeographicalLocation(
-                    weatherConfig.location().name(),
-                    weatherConfig.location().latitude(),
-                    weatherConfig.location().longitude());
+                    locationName,
+                    locationLatitude,
+                    locationLongitude);
 
             WeatherData weatherData = weatherService.getCurrentWeather(location).get();
 
@@ -53,9 +61,9 @@ public class WeatherController {
 
         try {
             GeographicalLocation location = new GeographicalLocation(
-                    weatherConfig.location().name(),
-                    weatherConfig.location().latitude(),
-                    weatherConfig.location().longitude());
+                    locationName,
+                    locationLatitude,
+                    locationLongitude);
 
             WeatherDataForecast forecastData =
                     weatherService.getWeatherForecast(location).get();

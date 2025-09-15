@@ -15,25 +15,25 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
 @TestPropertySource(properties = {"spring.cloud.config.enabled=false", "spring.cache.type=none"})
 class FlightScheduleETLProcessTest {
 
-    @MockBean
+    @MockitoBean
     private SparkSession mockSparkSession;
 
-    @MockBean
+    @MockitoBean
     private FlightScheduleExtractor mockExtractor;
 
-    @MockBean
+    @MockitoBean
     private FlightScheduleTransformer mockTransformer;
 
-    @MockBean
+    @MockitoBean
     private FlightScheduleLoader mockLoader;
 
     @Autowired
@@ -63,7 +63,7 @@ class FlightScheduleETLProcessTest {
             doNothing().when(mockLoader).load(mockDataset, destination);
 
             // When & Then
-            assertThatCode(() -> etlProcess.run(source, destination)).doesNotThrowAnyException();
+            assertThatCode(() -> etlProcess.process(source, destination)).doesNotThrowAnyException();
 
             verify(mockExtractor).extract(source);
             verify(mockTransformer).transform(mockDataset);
@@ -85,7 +85,7 @@ class FlightScheduleETLProcessTest {
             doNothing().when(mockLoader).load(emptyDataset, destination);
 
             // When & Then
-            assertThatCode(() -> etlProcess.run(source, destination)).doesNotThrowAnyException();
+            assertThatCode(() -> etlProcess.process(source, destination)).doesNotThrowAnyException();
 
             verify(mockExtractor).extract(source);
             verify(mockTransformer).transform(emptyDataset);
@@ -104,8 +104,8 @@ class FlightScheduleETLProcessTest {
             doNothing().when(mockLoader).load(mockDataset, destination);
 
             // When - Execute twice
-            assertThatCode(() -> etlProcess.run(source, destination)).doesNotThrowAnyException();
-            assertThatCode(() -> etlProcess.run(source, destination)).doesNotThrowAnyException();
+            assertThatCode(() -> etlProcess.process(source, destination)).doesNotThrowAnyException();
+            assertThatCode(() -> etlProcess.process(source, destination)).doesNotThrowAnyException();
 
             // Then - Should use cached results (Spring cache behavior)
             verify(mockExtractor, atLeastOnce()).extract(source);
@@ -128,7 +128,7 @@ class FlightScheduleETLProcessTest {
             when(mockExtractor.extract(source)).thenThrow(new FlightScheduleException("Failed to extract data"));
 
             // When & Then
-            assertThatThrownBy(() -> etlProcess.run(source, destination))
+            assertThatThrownBy(() -> etlProcess.process(source, destination))
                     .isInstanceOf(FlightScheduleException.class)
                     .hasMessageContaining("ETL process failed");
 
@@ -149,7 +149,7 @@ class FlightScheduleETLProcessTest {
                     .thenThrow(new FlightScheduleException("Failed to transform data"));
 
             // When & Then
-            assertThatThrownBy(() -> etlProcess.run(source, destination))
+            assertThatThrownBy(() -> etlProcess.process(source, destination))
                     .isInstanceOf(FlightScheduleException.class)
                     .hasMessageContaining("ETL process failed");
 
@@ -172,7 +172,7 @@ class FlightScheduleETLProcessTest {
                     .load(mockDataset, destination);
 
             // When & Then
-            assertThatThrownBy(() -> etlProcess.run(source, destination))
+            assertThatThrownBy(() -> etlProcess.process(source, destination))
                     .isInstanceOf(FlightScheduleException.class)
                     .hasMessageContaining("ETL process failed");
 

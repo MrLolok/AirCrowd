@@ -1,0 +1,8 @@
+flights:
+  etl:
+    source: data/flights.xlsx
+    destination: flight_schedule
+  schedule:
+    delay: 0
+    period: 30
+    unit: MINUTES

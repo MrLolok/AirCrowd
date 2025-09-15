@@ -1,5 +1,6 @@
 package it.lorenzoangelino.aircrowd.flightschedule.spark;
 
+import it.lorenzoangelino.aircrowd.common.spark.SparkDataLoader;
 import it.lorenzoangelino.aircrowd.flightschedule.exceptions.FlightScheduleException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.sql.Dataset;

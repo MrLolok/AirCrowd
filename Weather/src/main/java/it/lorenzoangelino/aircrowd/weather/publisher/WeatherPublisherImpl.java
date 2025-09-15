@@ -1,17 +1,18 @@
 package it.lorenzoangelino.aircrowd.weather.publisher;
 
-import it.lorenzoangelino.aircrowd.common.kafka.producer.KafkaProducerService;
+import it.lorenzoangelino.aircrowd.common.kafka.KafkaProducerService;
 import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
-import it.lorenzoangelino.aircrowd.weather.config.WeatherConfigurationProperties;
 import it.lorenzoangelino.aircrowd.weather.services.WeatherService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,7 +22,27 @@ public class WeatherPublisherImpl implements WeatherPublisher {
 
     private final WeatherService weatherService;
     private final KafkaProducerService kafkaProducerService;
-    private final WeatherConfigurationProperties weatherConfig;
+
+    @Value("${weather.publisher.weather-data-output-topic}")
+    private String weatherDataOutputTopic;
+    
+    @Value("${weather.publisher.task.delay}")
+    private long taskDelay;
+    
+    @Value("${weather.publisher.task.period}")
+    private long taskPeriod;
+    
+    @Value("${weather.publisher.task.unit}")
+    private TimeUnit taskUnit;
+    
+    @Value("${weather.location.name}")
+    private String locationName;
+    
+    @Value("${weather.location.latitude}")
+    private double locationLatitude;
+    
+    @Value("${weather.location.longitude}")
+    private double locationLongitude;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread t = new Thread(r, "weather-publisher");
         t.setDaemon(true);
@@ -36,9 +57,9 @@ public class WeatherPublisherImpl implements WeatherPublisher {
     public void init() {
         // Initialize default location from configuration
         this.defaultLocation = new GeographicalLocation(
-                weatherConfig.location().name(),
-                weatherConfig.location().latitude(),
-                weatherConfig.location().longitude());
+                locationName,
+                locationLatitude,
+                locationLongitude);
 
         // Start automatic publishing
         start(defaultLocation);
@@ -51,11 +72,10 @@ public class WeatherPublisherImpl implements WeatherPublisher {
             this.defaultLocation = location;
             this.running = true;
 
-            var task = weatherConfig.publisher().task();
             publishingTask =
-                    scheduler.scheduleAtFixedRate(this::publishWeatherData, task.delay(), task.period(), task.unit());
+                    scheduler.scheduleAtFixedRate(this::publishWeatherData, taskDelay, taskPeriod, taskUnit);
 
-            log.info("Weather Publisher scheduled to run every {} {}", task.period(), task.unit());
+            log.info("Weather Publisher scheduled to run every {} {}", taskPeriod, taskUnit);
         } else {
             log.info("Weather Publisher is already running");
         }
@@ -93,7 +113,7 @@ public class WeatherPublisherImpl implements WeatherPublisher {
 
     @Override
     public void publishWeatherDataForecast(WeatherDataForecast data) {
-        String topic = weatherConfig.publisher().weatherDataOutputTopic();
+        String topic = weatherDataOutputTopic;
 
         try {
             data.hourlyWeatherData().forEach(weatherData -> {

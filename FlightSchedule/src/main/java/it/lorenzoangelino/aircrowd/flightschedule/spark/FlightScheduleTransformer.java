@@ -3,7 +3,7 @@ package it.lorenzoangelino.aircrowd.flightschedule.spark;
 import static org.apache.spark.sql.functions.*;
 
 import it.lorenzoangelino.aircrowd.common.models.flights.enums.FlightType;
-import it.lorenzoangelino.aircrowd.common.spark.SparkTransformer;
+import it.lorenzoangelino.aircrowd.common.spark.SparkDataTransformer;
 import it.lorenzoangelino.aircrowd.flightschedule.spark.udfs.FlightCodeGeneratorUDF;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +15,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.types.DataTypes;
 
 @RequiredArgsConstructor
-public class FlightScheduleTransformer implements SparkTransformer {
+public class FlightScheduleTransformer implements SparkDataTransformer {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final boolean shiftDatesToday;
     private final boolean removeNameOfDay;

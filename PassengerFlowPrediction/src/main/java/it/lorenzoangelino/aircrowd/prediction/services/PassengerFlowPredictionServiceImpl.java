@@ -6,7 +6,6 @@ import it.lorenzoangelino.aircrowd.prediction.models.conditions.Condition;
 import it.lorenzoangelino.aircrowd.prediction.models.conditions.combined.impl.SimpleCombinedCondition;
 import it.lorenzoangelino.aircrowd.prediction.models.criticality.CriticalityScore;
 import it.lorenzoangelino.aircrowd.prediction.providers.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,17 +40,8 @@ public class PassengerFlowPredictionServiceImpl implements PassengerFlowPredicti
             throw new PredictionProcessingException("Failed to get prediction condition", e);
         }
     }
-    
+
     @Override
-    public WeatherConditionProvider getWeatherConditionProvider() {
-        return weatherConditionProvider;
-    }
-    
-    @Override
-    public FlightFlowConditionProvider getFlightFlowConditionProvider() {
-        return flightFlowConditionProvider;
-    }
-    
     @Cacheable(cacheNames = "prediction-results", key = "#start + '_' + #end")
     public PassengerFlowPrediction predictPassengerFlow(LocalDateTime start, LocalDateTime end) {
         log.info("Predicting passenger flow for period: {} to {}", start, end);
@@ -63,7 +53,7 @@ public class PassengerFlowPredictionServiceImpl implements PassengerFlowPredicti
                 throw new PredictionProcessingException("No conditions available for prediction period");
             }
             
-            CriticalityScore criticalityScore = condition.get().calculateCriticality();
+            CriticalityScore criticalityScore = condition.get().getCriticalityScore();
             
             // Calculate predicted passenger flow based on criticality
             int predictedFlow = calculatePassengerFlow(criticalityScore);
@@ -79,8 +69,6 @@ public class PassengerFlowPredictionServiceImpl implements PassengerFlowPredicti
                 criticalityScore.getLevel(),
                 (double) criticalityScore.getValue(),
                 predictedFlow,
-                null, // Weather forecast would come from weather service
-                null, // Flight flow would come from flight service  
                 description
             );
             

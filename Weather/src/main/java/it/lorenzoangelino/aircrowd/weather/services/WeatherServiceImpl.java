@@ -4,7 +4,6 @@ import it.lorenzoangelino.aircrowd.common.models.locations.GeographicalLocation;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherData;
 import it.lorenzoangelino.aircrowd.common.models.weather.WeatherDataForecast;
 import it.lorenzoangelino.aircrowd.weather.provider.WeatherDataProvider;
-import it.lorenzoangelino.aircrowd.weather.publisher.WeatherPublisher;
 import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +15,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class WeatherServiceImpl implements WeatherService {
     private final WeatherDataProvider weatherDataProvider;
-    private final WeatherPublisher weatherPublisher;
     private volatile boolean isPublishingActive = false;
 
-    public WeatherServiceImpl(WeatherDataProvider weatherDataProvider, WeatherPublisher weatherPublisher) {
+    public WeatherServiceImpl(WeatherDataProvider weatherDataProvider) {
         this.weatherDataProvider = weatherDataProvider;
-        this.weatherPublisher = weatherPublisher;
     }
 
     @Override
@@ -32,9 +29,8 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public void startAutomaticPublishing(GeographicalLocation location) {
         if (!isPublishingActive) {
-            log.info("Starting automatic weather publishing for location: {}", location.name());
+            log.info("Automatic publishing control for location: {} - This is handled by WeatherPublisher", location.name());
             isPublishingActive = true;
-            // Implementation for automatic publishing would go here
         } else {
             log.info("Automatic publishing is already active");
         }
@@ -43,7 +39,7 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public void stopAutomaticPublishing() {
         if (isPublishingActive) {
-            log.info("Stopping automatic weather publishing");
+            log.info("Stopping automatic weather publishing - This is handled by WeatherPublisher");
             isPublishingActive = false;
         }
     }

@@ -3,15 +3,17 @@ package it.lorenzoangelino.aircrowd.common.spark;
 public interface SparkETLProcess {
     void process(String source, String destination);
 
-    SparkExtractor getExtractor();
+    SparkDataExtractor getExtractor();
 
-    SparkTransformer getTransformer();
+    SparkDataTransformer getTransformer();
 
-    SparkLoader getLoader();
+    SparkDataLoader getLoader();
 
-    void setExtractor(SparkExtractor extractor);
+    void setExtractor(SparkDataExtractor extractor);
 
-    void setTransformer(SparkTransformer transformer);
+    void setTransformer(SparkDataTransformer transformer);
 
-    void setLoader(SparkLoader loader);
+    void setLoader(SparkDataLoader loader);
+
+    void cleanup();
 }
