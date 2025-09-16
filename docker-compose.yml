@@ -7,6 +7,7 @@ services:
       - aircrowd-network
     ports:
       - ${KAFKA_EXTERNAL_PORT}:9092
+      - ${KAFKA_INTERNAL_PORT}:9093
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -54,32 +55,72 @@ services:
       timeout: 5s
       retries: 5
 
+  postgres:
+    image: postgis/postgis:latest
+    container_name: postgres
+    hostname: postgres
+    restart: "no"
+    volumes:
+      - aircrowd-postgres-volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - PGUSER=${DATABASE_USER}
+    ports:
+      - "5432:5432"
+    networks:
+      aircrowd-network:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    hostname: pgadmin
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${UI_DATABASE_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${UI_DATABASE_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=${UI_DATABASE_ENABLE_LOGIN_SCREEN}
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=${UI_DATABASE_ENABLE_LOGIN_SCREEN}
+    volumes:
+      - ./configs/pgadmin/servers.json:/pgadmin4/servers.json
+      - ./configs/pgadmin/pgpass:/pgpass
+      - aircrowd-pgadmin-volume:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      aircrowd-network:
+
   discovery-server:
     build:
-      context: DiscoveryServer
+      context: .
       dockerfile: Dockerfile
     container_name: aircrowd-discovery-server
     hostname: aircrowd-discovery-server
     restart: always
     ports:
-      - "${EUREKA_PORT:-8761}:8761"
-    environment:
-      - EUREKA_HOSTNAME=aircrowd-discovery-server
+      - "8761:8761"
     networks:
       - aircrowd-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
-      interval: 30s
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 5s
       timeout: 10s
       retries: 5
 
-  weather-service:
+  passenger-flow-prediction-service:
     build:
-      context: Weather
+      context: .
       dockerfile: Dockerfile
-    container_name: aircrowd-weather-service
-    hostname: aircrowd-weather-service
+    container_name: aircrowd-passenger-flow-prediction-service
+    hostname: aircrowd-passenger-flow-prediction-service
     restart: always
+    ports:
+      - "8083:8080"
     depends_on:
       kafka:
         condition: service_healthy
@@ -87,24 +128,71 @@ services:
         condition: service_healthy
       discovery-server:
         condition: service_healthy
-    volumes:
-      - aircrowd-weather-service:/home/app/configs
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://aircrowd-discovery-service:8761/eureka/
       - REDIS_HOST=aircrowd-redis
       - REDIS_PORT=6379
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      aircrowd-network:
+
+  flight-schedule-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aircrowd-flight-schedule-service
+    hostname: aircrowd-flight-schedule-service
+    restart: always
+    ports:
+      - "8082:8080"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://aircrowd-discovery-service:8761/eureka/
+      - REDIS_HOST=aircrowd-redis
+      - REDIS_PORT=6379
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      aircrowd-network:
+
+  weather-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aircrowd-weather-service
+    hostname: aircrowd-weather-service
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://aircrowd-discovery-service:8761/eureka/
+      - REDIS_HOST=aircrowd-redis
+      - REDIS_PORT=6379
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     networks:
       aircrowd-network:
 
   airport-management-service:
     build:
-      context: AirportManagement
+      context: .
       dockerfile: Dockerfile
     container_name: aircrowd-airport-management-service
     hostname: aircrowd-airport-management-service
     restart: always
     ports:
-      - "${AIRPORT_MANAGEMENT_PORT:-8080}:8080"
+      - "8080:8080"
     depends_on:
       redis:
         condition: service_healthy
@@ -114,22 +202,17 @@ services:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://aircrowd-discovery-service:8761/eureka/
       - REDIS_HOST=aircrowd-redis
       - REDIS_PORT=6379
-      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
-      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
-      - POSTGRES_DB=${POSTGRES_DB:-aircrowd}
-      - POSTGRES_USERNAME=${POSTGRES_USERNAME:-aircrowd}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-aircrowd123}
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USERNAME=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     networks:
       - aircrowd-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/airport-management/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
 volumes:
-  aircrowd-weather-service:
+  aircrowd-postgres-volume:
+  aircrowd-pgadmin-volume:
   aircrowd-redis-data:
 
 networks:

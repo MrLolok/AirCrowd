@@ -1,17 +1,39 @@
-FROM amazoncorretto:24-alpine
+FROM maven:3.9.11-amazoncorretto-24-alpine AS builder
 
-ARG NAME=AirCrowd
-ARG SERVICE=Weather
-ARG VERSION=1.0.0-SNAPSHOT
-ARG JAR_FILE=target/${NAME}-${SERVICE}-${VERSION}.jar
+WORKDIR /build
 
-RUN mkdir -p "/home/app"
-WORKDIR "/home/app"
+# Copy the Maven POM files for the root and modules
+COPY pom.xml ./
+COPY Weather/pom.xml ./Weather/
 
-# Copy main jar file
-COPY ${JAR_FILE} app.jar
+# Modify the root pom.xml to include common and Weather modules
+# Exlude other modules
+RUN sed -i '/<modules>/,/<\/modules>/c\<modules>\n<module>Weather</module>\n</modules>' pom.xml
 
-# Copy dependencies
-COPY target/lib/ lib/
+# Dependency download for module Weather
+RUN mvn dependency:go-offline -B -pl :aircrowd-weather -am
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Copy source code for Weather modules
+COPY Weather/src ./Weather/src
+
+# Build the application (aircrowd-weather module)
+RUN mvn clean package \
+    -pl :aircrowd-weather \
+    -am \
+    -DskipTests \
+    -Dmaven.test.skip=true \
+    -Dmaven.clover.skip=true \
+    -Dspotless.check.skip \
+    -Dspotless.apply.skip \
+    -B
+
+FROM maven:3.9.11-amazoncorretto-24-alpine AS runtime
+
+WORKDIR /app
+
+EXPOSE 8080
+
+# Copy application JAR file
+COPY --from=builder /build/Weather/target/TapTaste-Kitchen-Weather*.jar /app/app.jar
+
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-jar", "app.jar"]
